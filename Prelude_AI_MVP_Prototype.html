@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prelude AI — Pre-Meeting Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --midnight:#0C1E3C; --ocean:#185FA5; --signal:#378ADD; --clarity:#85B7EB;
+  --frost:#E6F1FB; --insight:#1D9E75; --insight-light:#E8F8F1;
+  --neutral:#F1EFE8; --warn:#BA7517; --warn-light:#FFF3CD;
+  --danger:#993C1D; --danger-light:#FEF2F2; --purple:#534AB7;
+  --white:#FFFFFF; --gray-50:#F9FAFB; --gray-100:#F3F4F6;
+  --gray-200:#E5E7EB; --gray-300:#D1D5DB; --gray-400:#9CA3AF;
+  --gray-500:#6B7280; --gray-600:#4B5563; --gray-700:#374151;
+  --text:#111827; --serif:'DM Serif Display',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --radius:8px; --radius-lg:14px; --radius-xl:20px;
+  --shadow:0 1px 8px rgba(12,30,60,.08); --shadow-md:0 4px 16px rgba(12,30,60,.10);
+  --shadow-lg:0 8px 32px rgba(12,30,60,.16);
+  --tr:0.18s cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh;}
+.hidden{display:none!important;}
+
+/* TOAST */
+#toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--midnight);color:white;padding:11px 16px;border-radius:var(--radius);font-size:13px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;animation:slideUp .25s ease;max-width:340px;}
+.toast.success{background:var(--insight);} .toast.warn{background:var(--warn);} .toast.error{background:var(--danger);}
+@keyframes slideUp{from{transform:translateY(12px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+/* OVERLAY */
+.ov{position:fixed;inset:0;background:rgba(12,30,60,.55);z-index:800;display:flex;align-items:center;justify-content:center;padding:20px;animation:fIn .2s ease;}
+@keyframes fIn{from{opacity:0;}to{opacity:1;}}
+.modal{background:white;border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);width:100%;overflow:hidden;animation:mIn .25s ease;}
+@keyframes mIn{from{transform:translateY(18px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.mh{padding:18px 22px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;}
+.mt{font-family:var(--serif);font-size:19px;color:var(--midnight);}
+.mb{padding:22px;}
+.mf{padding:14px 22px;border-top:1px solid var(--gray-200);display:flex;gap:10px;justify-content:flex-end;}
+
+/* LAYOUT */
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:220px;background:var(--midnight);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform var(--tr);}
+.sl{padding:18px 14px 14px;border-bottom:1px solid rgba(255,255,255,.07);}
+.logo{display:flex;align-items:center;gap:9px;cursor:pointer;}
+.bars{display:flex;align-items:flex-end;gap:3px;height:20px;}
+.bar{border-radius:2px;background:var(--signal);}
+.b1{width:4px;height:9px;opacity:.4;} .b2{width:4px;height:14px;opacity:.7;} .b3{width:4px;height:20px;}
+.ln{font-family:var(--serif);font-size:18px;color:white;}
+.lai{font-size:10px;font-weight:600;color:var(--clarity);letter-spacing:3px;margin-top:-1px;}
+nav{padding:6px 0;flex:1;overflow-y:auto;}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 14px;color:rgba(255,255,255,.55);cursor:pointer;font-size:13px;border-left:3px solid transparent;transition:all var(--tr);user-select:none;}
+.ni:hover{color:rgba(255,255,255,.9);background:rgba(255,255,255,.04);}
+.ni.active{color:white;border-left-color:var(--signal);background:rgba(55,138,221,.1);}
+.ni-icon{font-size:16px;width:18px;text-align:center;flex-shrink:0;}
+.nb{margin-left:auto;background:var(--danger);color:white;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;}
+.sf{padding:12px 14px;border-top:1px solid rgba(255,255,255,.07);}
+.pill{display:inline-block;background:var(--insight);color:white;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.6px;margin-bottom:5px;}
+.un{color:white;font-size:13px;font-weight:500;}
+.ue{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px;}
+.fb{margin-top:9px;}
+.fbl{font-size:10px;color:rgba(255,255,255,.35);margin-bottom:3px;}
+.fbr{height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;}
+.fbf{height:100%;background:var(--warn);border-radius:2px;transition:width .4s;}
+
+.main{margin-left:220px;flex:1;padding:26px 30px;min-height:100vh;}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;}
+.ptitle{font-family:var(--serif);font-size:25px;color:var(--midnight);letter-spacing:-.3px;}
+.psub{font-size:12px;color:var(--gray-500);margin-top:2px;}
+
+/* CARDS */
+.card{background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;border:1px solid var(--gray-200);}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.ct{font-size:11px;font-weight:700;color:var(--gray-500);letter-spacing:.6px;text-transform:uppercase;}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.sc{background:white;border-radius:var(--radius);padding:13px 15px;box-shadow:var(--shadow);border:1px solid var(--gray-200);}
+.sl2{font-size:11px;color:var(--gray-500);font-weight:500;margin-bottom:2px;}
+.sv{font-size:24px;font-weight:700;color:var(--midnight);letter-spacing:-1px;line-height:1.1;}
+.ss{font-size:11px;color:var(--insight);margin-top:2px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all var(--tr);font-family:var(--sans);white-space:nowrap;}
+.btn:active{transform:scale(.97);}
+.bp{background:var(--ocean);color:white;} .bp:hover{background:var(--midnight);}
+.bi{background:var(--insight);color:white;} .bi:hover{background:#178a63;}
+.bs{background:white;color:var(--midnight);border:1px solid var(--gray-200);} .bs:hover{border-color:var(--ocean);color:var(--ocean);background:var(--frost);}
+.bg{background:transparent;color:var(--gray-500);border:1px solid transparent;} .bg:hover{background:var(--gray-100);color:var(--midnight);}
+.bd{background:var(--danger);color:white;}
+.bsm{padding:5px 11px;font-size:12px;}
+.blg{padding:10px 20px;font-size:14px;}
+.bfw{width:100%;justify-content:center;}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;}
+.bg2{background:var(--insight-light);color:var(--insight);}
+.bb{background:var(--frost);color:var(--ocean);}
+.bgr{background:var(--gray-100);color:var(--gray-600);}
+.bw{background:var(--warn-light);color:var(--warn);}
+.bd2{background:var(--danger-light);color:var(--danger);}
+.pulse{animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
+
+/* INPUTS */
+.ig{margin-bottom:13px;}
+.il{font-size:12px;font-weight:500;color:var(--gray-700);margin-bottom:4px;display:block;}
+.inp{width:100%;padding:8px 11px;border:1px solid var(--gray-300);border-radius:var(--radius);font-family:var(--sans);font-size:13px;color:var(--text);background:white;transition:border-color var(--tr),box-shadow var(--tr);outline:none;}
+.inp:focus{border-color:var(--ocean);box-shadow:0 0 0 3px rgba(24,95,165,.1);}
+.ih{font-size:11px;color:var(--gray-400);margin-top:3px;}
+select.inp{cursor:pointer;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;text-align:left;padding:8px 11px;border-bottom:2px solid var(--gray-200);white-space:nowrap;cursor:pointer;}
+.tbl th:hover{color:var(--ocean);}
+.tbl td{font-size:13px;padding:9px 11px;border-bottom:1px solid var(--gray-100);color:var(--gray-700);}
+.tbl tr:hover td{background:var(--gray-50);}
+.tbl tr:last-child td{border-bottom:none;}
+
+/* PROGRESS */
+.pw{width:68px;height:5px;background:var(--gray-200);border-radius:3px;overflow:hidden;}
+.pf{height:100%;border-radius:3px;}
+
+/* TOGGLE */
+.tw{display:flex;align-items:flex-start;gap:10px;padding:7px 0;cursor:pointer;}
+.tgl{position:relative;width:34px;height:19px;flex-shrink:0;margin-top:1px;}
+.tgl input{opacity:0;width:0;height:0;position:absolute;}
+.ts{position:absolute;inset:0;background:var(--gray-300);border-radius:20px;cursor:pointer;transition:background var(--tr);}
+.ts:before{content:'';position:absolute;height:13px;width:13px;left:3px;top:3px;background:white;border-radius:50%;transition:transform var(--tr);box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.tgl input:checked+.ts{background:var(--insight);}
+.tgl input:checked+.ts:before{transform:translateX(15px);}
+.tll{font-size:13px;color:var(--gray-700);}
+.tls{font-size:11px;color:var(--gray-400);margin-top:1px;}
+
+/* STEP DOTS */
+.sdots{display:flex;gap:5px;margin-bottom:18px;}
+.sd{height:5px;border-radius:3px;transition:all .3s;}
+.sd.past{background:var(--insight);width:18px;}
+.sd.curr{background:var(--ocean);width:26px;}
+.sd.fut{background:var(--gray-200);width:18px;}
+
+/* CONNECT */
+.co{display:flex;align-items:center;gap:12px;padding:13px 15px;border:1.5px solid var(--gray-200);border-radius:var(--radius);cursor:pointer;transition:all var(--tr);margin-bottom:9px;}
+.co:hover{border-color:var(--ocean);background:var(--frost);}
+.co.connected{border-color:var(--insight);background:var(--insight-light);}
+.cn{font-weight:500;font-size:14px;color:var(--midnight);}
+.cs{font-size:12px;color:var(--gray-500);}
+.cs.ok{color:var(--insight);font-weight:500;}
+
+/* BRIEF CARDS */
+.bc{background:white;border-radius:var(--radius-lg);border:1px solid var(--gray-200);box-shadow:var(--shadow);overflow:hidden;margin-bottom:11px;transition:box-shadow var(--tr),border-color var(--tr);}
+.bc:hover{box-shadow:var(--shadow-md);border-color:var(--clarity);}
+.bch{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray-200);cursor:pointer;}
+.bcc{font-weight:600;font-size:14px;color:var(--midnight);}
+.bcm{font-size:11px;color:var(--gray-500);margin-top:1px;}
+.bcb{padding:15px 16px;display:none;}
+.bcb.open{display:block;}
+.bst{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ocean);margin-bottom:5px;}
+.btxt{font-size:13px;color:var(--gray-700);line-height:1.6;}
+.bsrc{font-size:10px;color:var(--gray-400);margin-top:2px;}
+.ni2{margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--gray-100);}
+.ni2:last-child{border:none;margin:0;padding:0;}
+.nh{font-size:13px;font-weight:500;color:var(--midnight);line-height:1.4;}
+.nd{font-size:10px;color:var(--gray-400);margin-top:1px;}
+.ns{font-size:12px;color:var(--gray-600);margin-top:2px;line-height:1.5;}
+.fin{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.fi{background:var(--gray-50);border-radius:6px;padding:7px 9px;border:1px solid var(--gray-200);}
+.fl{font-size:10px;color:var(--gray-500);font-weight:500;}
+.fv{font-size:13px;font-weight:700;color:var(--midnight);}
+.starter2{background:var(--insight-light);border-left:3px solid var(--insight);padding:9px 13px;border-radius:0 6px 6px 0;font-size:13px;color:var(--text);font-style:italic;margin-bottom:7px;line-height:1.5;}
+
+/* STARS */
+.stars{display:flex;gap:2px;cursor:pointer;}
+.star{font-size:19px;color:var(--gray-300);transition:color var(--tr);}
+.star.on{color:#F59E0B;}
+
+/* GEN STEPS */
+.gs{margin-top:10px;}
+.gst{display:flex;align-items:center;gap:9px;padding:7px 0;font-size:13px;color:var(--gray-500);border-bottom:1px solid var(--gray-100);}
+.gst:last-child{border:none;}
+.gi{width:18px;text-align:center;flex-shrink:0;font-size:14px;}
+.gst.done{color:var(--insight);} .gst.done .gi::before{content:'✓';color:var(--insight);font-weight:700;}
+.gst.act{color:var(--midnight);font-weight:500;} .gst.act .gi{animation:spin .8s linear infinite;display:inline-block;}
+.gst.pnd .gi::before{content:'○';color:var(--gray-300);}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* FULL BRIEF */
+.bf{position:fixed;inset:0;background:white;z-index:600;overflow-y:auto;display:none;}
+.bf.open{display:block;}
+.bfbar{background:var(--midnight);padding:11px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.bfi{max-width:700px;margin:0 auto;padding:36px 22px;}
+.bfs{margin-bottom:22px;}
+.bfs h4{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ocean);margin-bottom:9px;padding-bottom:5px;border-bottom:1px solid var(--gray-200);}
+
+/* CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:16px;}
+.cal-head{text-align:center;font-size:11px;font-weight:600;color:var(--gray-500);padding:6px 0;text-transform:uppercase;}
+.cal-day{min-height:76px;padding:5px;border:1px solid var(--gray-200);border-radius:5px;background:white;cursor:pointer;transition:background var(--tr);}
+.cal-day:hover{background:var(--gray-50);}
+.cal-day.today{border-color:var(--ocean);background:var(--frost);}
+.cal-day.other-month{background:var(--gray-50);opacity:.5;}
+.cal-num{font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:3px;}
+.cal-day.today .cal-num{color:var(--ocean);}
+.cal-evt{font-size:10px;padding:2px 4px;border-radius:3px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.ce-green{background:var(--insight-light);color:var(--insight);}
+.ce-blue{background:var(--frost);color:var(--ocean);}
+.ce-gray{background:var(--gray-100);color:var(--gray-600);}
+.cal-week{display:grid;grid-template-columns:60px repeat(5,1fr);gap:1px;}
+.cw-time{font-size:11px;color:var(--gray-400);text-align:right;padding-right:8px;padding-top:4px;}
+.cw-slot{min-height:52px;border:1px solid var(--gray-200);border-radius:4px;padding:3px;position:relative;}
+.cw-evt{background:var(--frost);border-left:3px solid var(--ocean);border-radius:0 4px 4px 0;padding:4px 6px;font-size:11px;color:var(--midnight);font-weight:500;}
+
+/* NEWS FEED */
+.news-filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.nfc{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.na{background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:15px;box-shadow:var(--shadow);transition:box-shadow var(--tr);}
+.na:hover{box-shadow:var(--shadow-md);}
+.na-src{font-size:10px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.na-h{font-size:14px;font-weight:600;color:var(--midnight);line-height:1.4;margin-bottom:6px;}
+.na-sum{font-size:12px;color:var(--gray-600);line-height:1.5;margin-bottom:8px;}
+.na-foot{display:flex;align-items:center;justify-content:space-between;}
+.na-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;}
+.na-date{font-size:11px;color:var(--gray-400);}
+.na-rel{font-size:11px;color:var(--insight);font-weight:500;}
+
+/* AI MEETING NOTES */
+.mn-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.mn-out{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);padding:14px;min-height:320px;font-size:13px;color:var(--gray-700);line-height:1.7;}
+.mn-section{margin-bottom:12px;}
+.mn-title{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ocean);margin-bottom:5px;}
+.mn-item{padding:3px 0 3px 14px;position:relative;font-size:13px;}
+.mn-item::before{content:'•';position:absolute;left:2px;color:var(--ocean);}
+
+/* AI COACH */
+.chat-wrap{display:flex;flex-direction:column;height:420px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.msg{max-width:82%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.55;}
+.msg.ai{background:white;border:1px solid var(--gray-200);color:var(--text);align-self:flex-start;border-radius:4px 12px 12px 12px;}
+.msg.user{background:var(--ocean);color:white;align-self:flex-end;border-radius:12px 4px 12px 12px;}
+.chat-in{display:flex;gap:8px;padding:11px;border-top:1px solid var(--gray-200);background:white;}
+.chat-in input{flex:1;border:1px solid var(--gray-200);border-radius:var(--radius);padding:8px 11px;font-family:var(--sans);font-size:13px;outline:none;}
+.chat-in input:focus{border-color:var(--ocean);}
+.qp{display:flex;gap:6px;flex-wrap:wrap;padding:8px 11px;border-top:1px solid var(--gray-100);background:white;}
+.qb{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--gray-200);background:white;cursor:pointer;color:var(--gray-700);transition:all var(--tr);}
+.qb:hover{border-color:var(--ocean);color:var(--ocean);background:var(--frost);}
+
+/* SEARCH */
+.srch{display:flex;align-items:center;gap:7px;background:white;border:1px solid var(--gray-200);border-radius:var(--radius);padding:6px 11px;transition:border-color var(--tr);}
+.srch:focus-within{border-color:var(--ocean);}
+.srch input{border:none;outline:none;font-size:13px;font-family:var(--sans);color:var(--text);width:200px;}
+
+/* PAYWALL */
+.pw-wrap{background:white;border-radius:var(--radius-xl);max-width:540px;width:100%;overflow:hidden;}
+.pwh{background:var(--midnight);padding:26px;text-align:center;}
+.pwtitle{font-family:var(--serif);font-size:24px;color:white;margin-bottom:5px;}
+.pwsub{font-size:13px;color:rgba(255,255,255,.6);line-height:1.6;}
+.pwb{padding:24px;}
+.tc{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:18px;}
+.tcard{border:2px solid var(--gray-200);border-radius:var(--radius);padding:14px;cursor:pointer;transition:all var(--tr);position:relative;}
+.tcard:hover{border-color:var(--ocean);}
+.tcard.sel{border-color:var(--ocean);background:var(--frost);}
+.tn{font-weight:700;font-size:14px;color:var(--midnight);}
+.tp{font-size:22px;font-weight:800;color:var(--midnight);margin:3px 0;}
+.tp span{font-size:11px;font-weight:400;color:var(--gray-500);}
+.tf{font-size:11px;color:var(--gray-600);margin-top:5px;line-height:1.6;}
+.tbadge{position:absolute;top:-8px;right:10px;background:var(--insight);color:white;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;}
+
+/* ONBOARD */
+.ob-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--midnight) 0%,#1a3a6e 100%);padding:20px;}
+.ob-card{background:white;border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);width:100%;max-width:440px;padding:34px;}
+
+/* TOUR TOOLTIP */
+.tour-overlay{position:fixed;inset:0;z-index:2000;pointer-events:none;}
+.tour-backdrop{position:fixed;inset:0;background:rgba(12,30,60,.65);z-index:2001;}
+.tour-box{position:fixed;z-index:2002;background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:20px;width:300px;animation:mIn .25s ease;pointer-events:all;}
+.tour-step{font-size:11px;font-weight:700;color:var(--ocean);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
+.tour-title{font-family:var(--serif);font-size:18px;color:var(--midnight);margin-bottom:8px;}
+.tour-desc{font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px;}
+.tour-dots{display:flex;gap:5px;margin-bottom:14px;}
+.tour-dot{width:6px;height:6px;border-radius:50%;background:var(--gray-200);}
+.tour-dot.on{background:var(--ocean);}
+.tour-arrow{position:absolute;width:12px;height:12px;background:white;transform:rotate(45deg);}
+.highlight-ring{position:fixed;z-index:2001;border-radius:var(--radius);box-shadow:0 0 0 4px var(--signal),0 0 0 8px rgba(55,138,221,.25);pointer-events:none;transition:all .4s ease;}
+
+/* PAYMENT */
+.ps{background:var(--frost);border-radius:var(--radius);padding:13px 15px;margin-bottom:18px;border:1px solid var(--clarity);}
+.pp{font-size:26px;font-weight:800;color:var(--midnight);}
+.pp span{font-size:13px;font-weight:400;color:var(--gray-500);}
+.pf2{font-size:12px;color:var(--gray-600);display:flex;align-items:center;gap:5px;padding:2px 0;}
+
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;padding:14px;}
+  .sgrid{grid-template-columns:1fr 1fr;}
+  .fin{grid-template-columns:1fr 1fr;}
+  .tc{grid-template-columns:1fr;}
+  .nfc{grid-template-columns:1fr;}
+  .mn-wrap{grid-template-columns:1fr;}
+  .ham{display:flex!important;}
+}
+.ham{display:none;position:fixed;top:12px;left:12px;z-index:200;background:var(--midnight);color:white;border:none;border-radius:var(--radius);padding:7px;cursor:pointer;font-size:17px;}
+</style>
+</head>
+<body>
+<button class="ham" onclick="document.getElementById('sb').classList.toggle('open')">☰</button>
+
+<!-- ONBOARDING -->
+<div id="ob-screen" class="ob-wrap">
+  <div class="ob-card">
+    <div class="logo" style="margin-bottom:24px;" onclick="">
+      <div class="bars"><div class="bar b1"></div><div class="bar b2"></div><div class="bar b3"></div></div>
+      <div><div class="ln" style="color:var(--midnight);">Prelude</div><div class="lai" style="color:var(--ocean);">AI</div></div>
+    </div>
+
+    <!-- SIGN IN (default) -->
+    <div id="ob-signin">
+      <div class="sdots"><div class="sd curr"></div><div class="sd fut"></div></div>
+      <div style="font-family:var(--serif);font-size:22px;color:var(--midnight);margin-bottom:5px;">Welcome back</div>
+      <div style="font-size:13px;color:var(--gray-500);margin-bottom:20px;">Sign in to your Prelude AI account.</div>
+      <div class="ig"><label class="il">Work email</label><input class="inp" id="si-email" type="email" placeholder="rahul@company.com"></div>
+      <div class="ig"><label class="il">Password</label><input class="inp" id="si-pw" type="password" placeholder="••••••••">
+        <div class="ih" style="cursor:pointer;color:var(--ocean);" onclick="showToast('Password reset link sent to your email','success')">Forgot password?</div>
+      </div>
+      <button class="btn bp bfw blg" style="margin-top:4px;" onclick="doSignIn()">Sign in →</button>
+      <div style="text-align:center;margin-top:12px;font-size:13px;color:var(--gray-500);">Don't have an account? <span style="color:var(--ocean);cursor:pointer;font-weight:500;" onclick="switchToSignup()">Create one free →</span></div>
+    </div>
+
+    <!-- SIGN UP -->
+    <div id="ob-signup" class="hidden">
+      <!-- Step 1 -->
+      <div id="su1">
+        <div class="sdots"><div class="sd curr"></div><div class="sd fut"></div><div class="sd fut"></div><div class="sd fut"></div></div>
+        <div style="font-family:var(--serif);font-size:22px;color:var(--midnight);margin-bottom:5px;">Create your account</div>
+        <div style="font-size:13px;color:var(--gray-500);margin-bottom:20px;">Start your 3 free briefs — no credit card required.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="ig"><label class="il">First name</label><input class="inp" id="su-fn" placeholder="Rahul"></div>
+          <div class="ig"><label class="il">Last name</label><input class="inp" id="su-ln" placeholder="Mehta"></div>
+        </div>
+        <div class="ig"><label class="il">Work email</label><input class="inp" id="su-email" type="email" placeholder="rahul@company.com"></div>
+        <div class="ig"><label class="il">Company</label><input class="inp" id="su-company" placeholder="TechCorp India"></div>
+        <div class="ig"><label class="il">Your role</label>
+          <select class="inp" id="su-role">
+            <option value="">Select your role</option>
+            <option>Account Executive</option><option>Senior Account Executive</option>
+            <option>Business Development Manager</option><option>Sales Manager</option>
+            <option>VP Sales</option><option>Founder / CEO</option><option>Other</option>
+          </select>
+        </div>
+        <div class="ig"><label class="il">Password</label><input class="inp" id="su-pw" type="password" placeholder="Minimum 8 characters"></div>
+        <div class="ig"><label class="il">Confirm password</label><input class="inp" id="su-pw2" type="password" placeholder="Re-enter password"></div>
+        <button class="btn bp bfw blg" style="margin-top:4px;" onclick="suStep(2)">Continue →</button>
+        <div style="text-align:center;margin-top:11px;font-size:13px;color:var(--gray-500);">Already have an account? <span style="color:var(--ocean);cursor:pointer;font-weight:500;" onclick="switchToSignin()">Sign in</span></div>
+      </div>
+
+      <!-- Step 2: Calendar connect -->
+      <div id="su2" class="hidden">
+        <div class="sdots"><div class="sd past"></div><div class="sd curr"></div><div class="sd fut"></div><div class="sd fut"></div></div>
+        <div style="font-family:var(--serif);font-size:22px;color:var(--midnight);margin-bottom:5px;">Connect your calendar</div>
+        <div style="font-size:13px;color:var(--gray-500);margin-bottom:20px;">Prelude AI reads your calendar to detect upcoming meetings. We request <strong>read-only access</strong> — we never create, modify, or delete your events.</div>
+        <div id="cal-g" class="co" onclick="connectCal('g')">
+          <span style="font-size:22px;">📅</span>
+          <div style="flex:1;"><div class="cn">Google Calendar</div><div class="cs" id="cgs">Connect your Google Workspace or Gmail calendar</div></div>
+          <button class="btn bp bsm" id="cgb">Connect →</button>
+        </div>
+        <div id="cal-o" class="co" onclick="connectCal('o')">
+          <span style="font-size:22px;">📧</span>
+          <div style="flex:1;"><div class="cn">Microsoft 365 / Outlook</div><div class="cs" id="cos">Connect your Outlook or Office 365 calendar</div></div>
+          <button class="btn bs bsm" id="cob">Connect →</button>
+        </div>
+        <div style="background:var(--frost);border-radius:var(--radius);padding:9px 13px;font-size:12px;color:var(--gray-600);margin-bottom:14px;">
+          🔒 <strong>Data we access:</strong> Meeting titles, start times, and attendee email domains only. We never read descriptions, attachments, or private notes.
+        </div>
+        <button class="btn bp bfw blg" id="cal-cont" disabled onclick="suStep(3)">Continue →</button>
+        <button class="btn bg bfw" style="margin-top:7px;" onclick="suStep(3)">Skip for now</button>
+      </div>
+
+      <!-- Step 3: All set -->
+      <div id="su3" class="hidden">
+        <div class="sdots"><div class="sd past"></div><div class="sd past"></div><div class="sd past"></div><div class="sd curr"></div></div>
+        <div style="font-size:40px;margin-bottom:12px;">⚡</div>
+        <div style="font-family:var(--serif);font-size:22px;color:var(--midnight);margin-bottom:5px;">You're all set!</div>
+        <div style="font-size:13px;color:var(--gray-500);margin-bottom:18px;line-height:1.6;">Prelude AI is now monitoring your calendar. Your first brief will arrive 30 minutes before your next meeting — automatically, with no effort from you.</div>
+        <div style="background:var(--insight-light);border:1px solid var(--insight);border-radius:var(--radius);padding:13px 15px;margin-bottom:18px;">
+          <div style="font-size:11px;font-weight:600;color:var(--insight);margin-bottom:3px;">Next meeting detected</div>
+          <div style="font-weight:600;color:var(--midnight);">Infosys Limited — Today at 09:00</div>
+          <div style="font-size:12px;color:var(--gray-500);margin-top:1px;">Brief will be delivered to your inbox at 08:30</div>
+        </div>
+        <div style="font-size:13px;color:var(--gray-600);margin-bottom:14px;">You have <strong>3 free briefs</strong> included. No credit card required.</div>
+        <button class="btn bp bfw blg" onclick="enterApp()">Go to my dashboard →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="layout hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sb">
+    <div class="sl">
+      <div class="logo" onclick="showScreen('dashboard')">
+        <div class="bars"><div class="bar b1"></div><div class="bar b2"></div><div class="bar b3"></div></div>
+        <div><div class="ln">Prelude</div><div class="lai">AI</div></div>
+      </div>
+    </div>
+    <nav>
+      <div class="ni active" id="n-dashboard" onclick="showScreen('dashboard')"><span class="ni-icon">⚡</span>Overview</div>
+      <div class="ni" id="n-briefs" onclick="showScreen('briefs')"><span class="ni-icon">📋</span>My Briefs</div>
+      <div class="ni" id="n-calendar" onclick="showScreen('calendar')"><span class="ni-icon">📅</span>Calendar</div>
+      <div class="ni" id="n-news" onclick="showScreen('news')"><span class="ni-icon">📰</span>News Feed</div>
+      <div class="ni" id="n-notes" onclick="showScreen('notes')"><span class="ni-icon">✍️</span>Meeting Notes</div>
+      <div class="ni" id="n-coach" onclick="showScreen('coach')"><span class="ni-icon">🤖</span>AI Coach</div>
+      <div class="ni" id="n-team" onclick="showScreen('team')"><span class="ni-icon">👥</span>Team<span class="nb">2</span></div>
+      <div class="ni" id="n-settings" onclick="showScreen('settings')"><span class="ni-icon">⚙️</span>Settings</div>
+      <div class="ni" id="n-upgrade" onclick="showScreen('upgrade')"><span class="ni-icon">⬆️</span>Upgrade</div>
+    </nav>
+    <div class="sf">
+      <div class="pill" id="sb-pill">STARTER</div>
+      <div class="un" id="sb-name">Rahul Mehta</div>
+      <div class="ue" id="sb-email">rahul@techcorp.in</div>
+      <div class="fb">
+        <div class="fbl" id="sb-flabel">2 of 3 free briefs used</div>
+        <div class="fbr"><div class="fbf" id="sb-ff" style="width:66%"></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <main class="main" id="app-main">
+
+    <!-- DASHBOARD -->
+    <div id="s-dashboard">
+      <div class="topbar">
+        <div><div class="ptitle" id="greeting">Good morning, Rahul</div><div class="psub">You have 2 meetings today. Your briefs are ready.</div></div>
+        <div style="display:flex;align-items:center;gap:9px;">
+          <div class="srch"><span style="color:var(--gray-400);">🔍</span><input type="text" placeholder="Search briefs..." oninput="searchBriefs(this.value)"></div>
+          <span style="cursor:pointer;font-size:20px;position:relative;" onclick="toggleNotif()">🔔<span style="position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:var(--danger);border-radius:50%;display:block;"></span></span>
+          <button class="btn bp bsm" onclick="showScreen('upgrade')">⬆ Upgrade</button>
+          <button class="btn bs bsm" onclick="startTour()">📖 How to use</button>
+        </div>
+      </div>
+
+      <div class="sgrid">
+        <div class="sc"><div class="sl2">Briefs this month</div><div class="sv">24</div><div class="ss">↑ 3 vs last month</div></div>
+        <div class="sc"><div class="sl2">Time saved</div><div class="sv">12h</div><div class="ss">≈ 30 min per brief</div></div>
+        <div class="sc"><div class="sl2">Avg brief rating</div><div class="sv">4.3</div><div class="ss">⭐ across all briefs</div></div>
+        <div class="sc"><div class="sl2">Next brief</div><div class="sv" style="font-size:17px;padding-top:3px;">08:30</div><div class="ss">Infosys Limited</div></div>
+      </div>
+
+      <div class="ct" style="margin-bottom:9px;">Today's briefs</div>
+
+      <!-- INFOSYS BRIEF -->
+      <div class="bc">
+        <div class="bch" onclick="toggleBC('inf')">
+          <div><div class="bcc">Infosys Limited</div><div class="bcm">Meeting at 09:00 · Brief delivered at 08:30</div></div>
+          <div style="display:flex;align-items:center;gap:7px;">
+            <span class="badge bg2">✓ Delivered</span>
+            <button class="btn bp bsm" onclick="event.stopPropagation();openFull('infosys')">View full brief →</button>
+          </div>
+        </div>
+        <div class="bcb" id="inf">
+          <div class="bst">Company Snapshot</div>
+          <div class="btxt">Infosys Limited is a global IT services and consulting company headquartered in Bengaluru, India. Founded in 1981 by N.R. Narayana Murthy and six co-founders, it now employs approximately 343,000 professionals across 56 countries. CEO Salil Parekh has led the company since January 2018. Listed on NSE, BSE, and NYSE (INFY).</div>
+          <div class="bsrc">Source: Clearbit Enrichment API · 5 Jun 2025</div>
+          <div class="bst" style="margin-top:11px;">Recent News</div>
+          <div class="ni2">
+            <div class="nh">Infosys signs strategic AI partnership with Microsoft Azure for cloud migration services</div>
+            <div class="nd">Economic Times · 28 May 2025</div>
+            <div class="ns">→ Confirms Infosys is doubling down on AI-as-a-service. Align your pitch to this direction.</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--gray-100);">
+            <span style="font-size:12px;color:var(--gray-500);">Rate this brief:</span>
+            <div class="stars" id="st-inf"><span class="star on" onclick="rate('st-inf',1)">★</span><span class="star on" onclick="rate('st-inf',2)">★</span><span class="star on" onclick="rate('st-inf',3)">★</span><span class="star on" onclick="rate('st-inf',4)">★</span><span class="star" onclick="rate('st-inf',5)">★</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RAZORPAY BRIEF (GENERATING) -->
+      <div class="bc">
+        <div class="bch" onclick="toggleBC('rp')">
+          <div><div class="bcc">Razorpay</div><div class="bcm">Meeting at 14:00 · Generating...</div></div>
+          <div style="display:flex;align-items:center;gap:7px;">
+            <span class="badge bb pulse" id="rp-badge">⚡ Generating</span>
+            <button class="btn bs bsm" onclick="event.stopPropagation();runGen()">Watch live →</button>
+          </div>
+        </div>
+        <div class="bcb" id="rp">
+          <div class="gs">
+            <div class="gst done" id="g1"><span class="gi">✓</span>Calendar event detected — Razorpay · 14:00</div>
+            <div class="gst done" id="g2"><span class="gi">✓</span>Company identified via attendee domain (razorpay.com)</div>
+            <div class="gst act" id="g3"><span class="gi">⟳</span>Fetching company profile from Clearbit...</div>
+            <div class="gst pnd" id="g4"><span class="gi"></span>Pulling last 30 days of news from NewsAPI</div>
+            <div class="gst pnd" id="g5"><span class="gi"></span>Fetching funding data from Crunchbase API</div>
+            <div class="gst pnd" id="g6"><span class="gi"></span>Synthesising brief with GPT-4o</div>
+            <div class="gst pnd" id="g7"><span class="gi"></span>Quality check — verifying all sources</div>
+            <div class="gst pnd" id="g8"><span class="gi"></span>Delivering to inbox at 13:30</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HDFC PAST -->
+      <div class="ct" style="margin:14px 0 9px;">Yesterday</div>
+      <div class="bc">
+        <div class="bch" onclick="toggleBC('hd')">
+          <div><div class="bcc">HDFC Bank</div><div class="bcm">Meeting was yesterday at 15:30</div></div>
+          <div style="display:flex;align-items:center;gap:7px;">
+            <span class="badge bgr">Delivered</span>
+            <div class="stars" id="st-hd" onclick="event.stopPropagation()"><span class="star on" onclick="rate('st-hd',1)">★</span><span class="star on" onclick="rate('st-hd',2)">★</span><span class="star on" onclick="rate('st-hd',3)">★</span><span class="star on" onclick="rate('st-hd',4)">★</span><span class="star" onclick="rate('st-hd',5)">★</span></div>
+            <button class="btn bg bsm" onclick="event.stopPropagation();openFull('hdfc')">View →</button>
+          </div>
+        </div>
+        <div class="bcb" id="hd">
+          <div class="bst">Company Snapshot</div>
+          <div class="btxt">HDFC Bank is India's largest private sector bank by market capitalisation and assets, headquartered in Mumbai. Founded in 1994, the bank operates over 8,700 branches and 20,000 ATMs across India. MD &amp; CEO: Sashidhar Jagdishan (since October 2020). Listed on BSE, NSE, and NYSE (HDB).</div>
+          <div class="bsrc">Source: Clearbit · 4 Jun 2025</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BRIEFS SCREEN -->
+    <div id="s-briefs" class="hidden">
+      <div class="topbar">
+        <div><div class="ptitle">My Briefs</div><div class="psub">All company briefs generated for your meetings</div></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select class="inp" style="width:auto;padding:6px 9px;" onchange="showToast('Filter applied','')">
+            <option>All time</option><option>This week</option><option>This month</option>
+          </select>
+          <button class="btn bs bsm" onclick="showToast('CSV exported successfully','success')">Export CSV</button>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="tbl">
+          <thead><tr><th onclick="showToast('Sorted by company','')">Company</th><th onclick="showToast('Sorted by date','')">Meeting</th><th>Status</th><th>Rating</th><th>Time saved</th><th>Actions</th></tr></thead>
+          <tbody id="briefs-body">
+            <tr><td><strong>Infosys Limited</strong></td><td>Today, 09:00</td><td><span class="badge bg2">✓ Delivered</span></td><td><span style="color:#F59E0B;">★★★★</span>☆</td><td style="color:var(--insight);">~30 min</td><td><button class="btn bg bsm" onclick="openFull('infosys')">View →</button></td></tr>
+            <tr><td><strong>HDFC Bank</strong></td><td>Yesterday, 15:30</td><td><span class="badge bgr">Delivered</span></td><td><span style="color:#F59E0B;">★★★★</span>☆</td><td style="color:var(--insight);">~30 min</td><td><button class="btn bg bsm" onclick="openFull('hdfc')">View →</button></td></tr>
+            <tr><td><strong>Zomato</strong></td><td>2 Jun, 11:00</td><td><span class="badge bgr">Delivered</span></td><td><span style="color:#F59E0B;">★★★★★</span></td><td style="color:var(--insight);">~30 min</td><td><button class="btn bg bsm" onclick="openFull('zomato')">View →</button></td></tr>
+            <tr><td><strong>Tata Consultancy Services</strong></td><td>1 Jun, 14:00</td><td><span class="badge bgr">Delivered</span></td><td><span style="color:#F59E0B;">★★★★</span>☆</td><td style="color:var(--insight);">~30 min</td><td><button class="btn bg bsm" onclick="openFull('tcs')">View →</button></td></tr>
+            <tr><td><strong>Paytm (One97 Communications)</strong></td><td>30 May, 10:00</td><td><span class="badge bgr">Delivered</span></td><td><span style="color:#F59E0B;">★★★</span>☆☆</td><td style="color:var(--insight);">~30 min</td><td><button class="btn bg bsm" onclick="openFull('paytm')">View →</button></td></tr>
+            <tr><td><strong>Swiggy</strong></td><td>28 May, 09:30</td><td><span class="badge bgr">Delivered</span></td><td><span style="color:#F59E0B;">★★★★★</span></td><td style="color:var(--insight);">~30 min</td><td><button class="btn bg bsm" onclick="openFull('swiggy')">View →</button></td></tr>
+          </tbody>
+        </table>
+        <div style="text-align:center;padding:12px;color:var(--gray-500);font-size:13px;border-top:1px solid var(--gray-100);">Showing 6 of 24 briefs · <span style="color:var(--ocean);cursor:pointer;">Load more</span></div>
+      </div>
+    </div>
+    <!-- CALENDAR SCREEN -->
+    <div id="s-calendar" class="hidden">
+      <div class="topbar">
+        <div><div class="ptitle">Calendar</div><div class="psub">All meetings with brief status</div></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn bs bsm" onclick="calView='month';buildCal()">Month</button>
+          <button class="btn bp bsm" onclick="calView='week';buildCal()">Week</button>
+          <button class="btn bs bsm" onclick="calPrev()">← Prev</button>
+          <span id="cal-title" style="font-weight:600;font-size:14px;color:var(--midnight);min-width:140px;text-align:center;"></span>
+          <button class="btn bs bsm" onclick="calNext()">Next →</button>
+        </div>
+      </div>
+      <div class="card">
+        <div id="cal-body"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">Upcoming meetings with briefs</div></div>
+        <table class="tbl">
+          <thead><tr><th>Meeting</th><th>Date &amp; time</th><th>Company detected</th><th>Brief status</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Intro call</strong></td><td>Today · 09:00</td><td>Infosys Limited</td><td><span class="badge bg2">✓ Delivered</span></td></tr>
+            <tr><td><strong>Product demo</strong></td><td>Today · 14:00</td><td>Razorpay</td><td><span class="badge bb pulse">⚡ Generating</span></td></tr>
+            <tr><td><strong>Quarterly business review</strong></td><td>Tomorrow · 10:00</td><td>Wipro Limited</td><td><span class="badge bgr">Scheduled · Brief at 09:30</span></td></tr>
+            <tr><td><strong>Discovery call</strong></td><td>7 Jun · 15:00</td><td>PhonePe</td><td><span class="badge bgr">Scheduled · Brief at 14:30</span></td></tr>
+            <tr><td><strong>Partnership discussion</strong></td><td>8 Jun · 11:00</td><td>Ola Electric</td><td><span class="badge bgr">Scheduled · Brief at 10:30</span></td></tr>
+            <tr><td><strong>Annual strategy review</strong></td><td>10 Jun · 14:00</td><td>Tata Steel</td><td><span class="badge bgr">Scheduled · Brief at 13:30</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NEWS FEED SCREEN -->
+    <div id="s-news" class="hidden">
+      <div class="topbar">
+        <div><div class="ptitle">News Feed</div><div class="psub">Recent business news filtered to your meeting schedule</div></div>
+      </div>
+      <div class="card" style="padding:14px 16px;">
+        <div class="news-filter-bar">
+          <select class="inp" style="width:auto;padding:6px 9px;" id="nf-company" onchange="filterNews()">
+            <option value="all">All companies</option>
+            <option value="infosys">Infosys</option><option value="hdfc">HDFC Bank</option>
+            <option value="razorpay">Razorpay</option><option value="tcs">TCS</option>
+            <option value="zomato">Zomato</option><option value="paytm">Paytm</option>
+          </select>
+          <select class="inp" style="width:auto;padding:6px 9px;" id="nf-time" onchange="filterNews()">
+            <option value="all">Any time</option>
+            <option value="today">Today</option><option value="week">Past 7 days</option>
+            <option value="month">Past 30 days</option><option value="quarter">Past 90 days</option>
+          </select>
+          <select class="inp" style="width:auto;padding:6px 9px;" id="nf-cat" onchange="filterNews()">
+            <option value="all">All categories</option>
+            <option value="earnings">Earnings &amp; Results</option>
+            <option value="leadership">Leadership &amp; People</option>
+            <option value="funding">Funding &amp; M&amp;A</option>
+            <option value="product">Products &amp; Strategy</option>
+            <option value="regulatory">Regulatory &amp; Legal</option>
+            <option value="partnership">Partnerships</option>
+          </select>
+          <select class="inp" style="width:auto;padding:6px 9px;" id="nf-sort" onchange="filterNews()">
+            <option value="newest">Newest first</option>
+            <option value="relevant">Most relevant</option>
+          </select>
+          <span id="nf-count" style="font-size:12px;color:var(--gray-500);margin-left:4px;"></span>
+        </div>
+      </div>
+      <div class="nfc" id="news-grid"></div>
+    </div>
+
+    <!-- MEETING NOTES SCREEN -->
+    <div id="s-notes" class="hidden">
+      <div class="topbar">
+        <div><div class="ptitle">AI Meeting Notes</div><div class="psub">Paste raw notes — AI structures them into a professional format</div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">Meeting context</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:4px;">
+          <div class="ig" style="margin:0;"><label class="il">Meeting</label>
+            <select class="inp" id="mn-meeting">
+              <option>Infosys — Intro call (Today 09:00)</option>
+              <option>HDFC Bank — QBR (Yesterday 15:30)</option>
+              <option>Razorpay — Product demo (Today 14:00)</option>
+              <option>Zomato — Discovery call (2 Jun)</option>
+            </select>
+          </div>
+          <div class="ig" style="margin:0;"><label class="il">Meeting type</label>
+            <select class="inp" id="mn-type">
+              <option>Discovery call</option><option>Product demo</option>
+              <option>QBR / Business review</option><option>Negotiation</option>
+              <option>Follow-up call</option><option>Closing call</option>
+            </select>
+          </div>
+          <div class="ig" style="margin:0;"><label class="il">Deal stage</label>
+            <select class="inp" id="mn-stage">
+              <option>Prospecting</option><option>Qualification</option>
+              <option>Demo / Evaluation</option><option>Proposal</option>
+              <option>Negotiation</option><option>Closed — Won</option><option>Closed — Lost</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="mn-wrap">
+        <div>
+          <div class="card">
+            <div class="ch"><div class="ct">Your raw notes</div>
+              <button class="btn bs bsm" onclick="loadSample()">Load sample</button>
+            </div>
+            <textarea class="inp" id="mn-input" style="height:280px;resize:vertical;line-height:1.7;" placeholder="Paste your raw meeting notes here — bullet points, fragments, shorthand, anything. AI will structure them.&#10;&#10;Example:&#10;- met sanjay and priya&#10;- they have 15 reps, currently using lsn&#10;- pain: no time for prep, briefs would help&#10;- budget q2, need approval from cfo&#10;- demo next week&#10;- they asked about crm integration"></textarea>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button class="btn bp" onclick="generateNotes()" id="mn-btn">✨ Generate structured notes</button>
+              <button class="btn bs bsm" onclick="document.getElementById('mn-input').value='';document.getElementById('mn-out').innerHTML='<div style=\'color:var(--gray-400);font-size:13px;padding:12px;\'>Your structured notes will appear here...</div>'">Clear</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="ch"><div class="ct">Structured output</div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn bs bsm" onclick="copyNotes()">Copy</button>
+                <button class="btn bi bsm" onclick="showToast('Notes saved to CRM (HubSpot)','success')">Save to CRM</button>
+              </div>
+            </div>
+            <div id="mn-out" style="min-height:280px;font-size:13px;color:var(--gray-700);line-height:1.7;">
+              <div style="color:var(--gray-400);padding:12px;">Your structured notes will appear here after generating...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI COACH SCREEN -->
+    <div id="s-coach" class="hidden">
+      <div class="topbar">
+        <div><div class="ptitle">AI Sales Coach</div><div class="psub">Context-aware suggestions for your upcoming meetings</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--gray-200);background:var(--midnight);">
+            <div style="font-size:13px;color:rgba(255,255,255,.7);">Coaching context: <strong style="color:white;" id="coach-ctx">Infosys — Intro call today</strong></div>
+          </div>
+          <div class="chat-wrap" style="border:none;border-radius:0;">
+            <div class="chat-msgs" id="chat-msgs">
+              <div class="msg ai">👋 Hi! I'm your AI Sales Coach. I've reviewed your Prelude AI brief for <strong>Infosys</strong> and I'm ready to help you prepare. What would you like to work on?</div>
+            </div>
+            <div class="qp">
+              <button class="qb" onclick="sendQ('How do I open the Infosys meeting?')">How to open the meeting</button>
+              <button class="qb" onclick="sendQ('What are the key talking points for Infosys?')">Key talking points</button>
+              <button class="qb" onclick="sendQ('How should I handle budget objections?')">Handle budget objections</button>
+              <button class="qb" onclick="sendQ('What buying signals should I look for?')">Buying signals to watch</button>
+              <button class="qb" onclick="sendQ('How do I use the Microsoft Azure news?')">Use the Azure news angle</button>
+              <button class="qb" onclick="sendQ('Write a follow-up email for after the demo')">Write a follow-up email</button>
+            </div>
+            <div class="chat-in">
+              <input type="text" id="chat-inp" placeholder="Ask your AI coach anything about this meeting..." onkeydown="if(event.key==='Enter')sendChat()">
+              <button class="btn bp bsm" onclick="sendChat()">Send →</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="ch"><div class="ct">Today's meetings</div></div>
+            <div style="font-size:13px;">
+              <div style="padding:10px 0;border-bottom:1px solid var(--gray-100);cursor:pointer;" onclick="setCoachCtx('Infosys — Intro call today')">
+                <div style="font-weight:600;color:var(--midnight);">Infosys Limited</div>
+                <div style="font-size:11px;color:var(--gray-500);">09:00 · Intro call</div>
+                <div style="margin-top:4px;"><span class="badge bg2" style="font-size:10px;">Brief ready</span></div>
+              </div>
+              <div style="padding:10px 0;cursor:pointer;" onclick="setCoachCtx('Razorpay — Product demo today')">
+                <div style="font-weight:600;color:var(--midnight);">Razorpay</div>
+                <div style="font-size:11px;color:var(--gray-500);">14:00 · Product demo</div>
+                <div style="margin-top:4px;"><span class="badge bb pulse" style="font-size:10px;">Brief generating</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct">Coaching tips</div></div>
+            <div style="font-size:12px;color:var(--gray-600);line-height:1.7;">
+              <div style="margin-bottom:8px;">💡 <strong>Use the Azure news</strong> — Infosys just announced a Microsoft partnership. This is a strong opener: it shows you've done your homework.</div>
+              <div style="margin-bottom:8px;">⚠️ <strong>Conservative FY26 guidance</strong> — avoid pushing for a large upfront commitment in the first meeting. Explore budget flexibility before discussing price.</div>
+              <div>✅ <strong>BFSI focus</strong> — Infosys CEO has signalled BFSI as a priority sector this year. If your product serves BFSI use cases, lead with that angle.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAM SCREEN -->
+    <div id="s-team" class="hidden">
+      <div class="topbar">
+        <div><div class="ptitle">Team Dashboard</div><div class="psub">Week of 2–6 June 2025 · TechCorp Sales · 8 members</div></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn bs bsm" onclick="showToast('Report exported','success')">Export</button>
+          <button class="btn bp bsm" onclick="showToast('Reminder sent to all 8 reps ✓','success')">Send reminder</button>
+        </div>
+      </div>
+      <div class="sgrid">
+        <div class="sc"><div class="sl2">Team prep score</div><div class="sv">4.1<span style="font-size:13px;color:var(--gray-400)">/5</span></div><div class="ss">↑ from 3.8 last week</div></div>
+        <div class="sc"><div class="sl2">Briefs generated</div><div class="sv">47</div><div class="ss">This week</div></div>
+        <div class="sc"><div class="sl2">Avg open rate</div><div class="sv">74%</div><div class="ss">↑ from 68% last week</div></div>
+        <div class="sc"><div class="sl2">Avg quality</div><div class="sv">4.2</div><div class="ss">⭐ all rated briefs</div></div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;">
+          <div class="ct" style="margin:0;">Rep performance</div>
+          <select class="inp" style="width:auto;padding:5px 8px;font-size:12px;" onchange="showToast('Filtered','')">
+            <option>All reps</option><option>Needs attention</option><option>On track</option>
+          </select>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>Rep</th><th>Briefs</th><th>Open rate</th><th>Avg rating</th><th>Habit</th><th>Last brief</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Rahul Mehta</strong> <span class="badge bb" style="font-size:9px;">You</span></td><td>8</td><td>88%</td><td>★ 4.3</td><td><div class="pw"><div class="pf" style="width:88%;background:var(--insight)"></div></div></td><td>Today 09:00</td><td><button class="btn bg bsm" onclick="openFull('infosys')">View brief →</button></td></tr>
+            <tr><td><strong>Anjali Singh</strong></td><td>7</td><td>86%</td><td>★ 4.5</td><td><div class="pw"><div class="pf" style="width:86%;background:var(--insight)"></div></div></td><td>Today 10:30</td><td><button class="btn bg bsm" onclick="showToast('Brief opened for Anjali Singh','success')">View brief →</button></td></tr>
+            <tr><td><strong>Vikram Bose</strong></td><td>5</td><td>60%</td><td>★ 3.8</td><td><div class="pw"><div class="pf" style="width:60%;background:var(--warn)"></div></div></td><td>Yesterday</td><td><button class="btn bg bsm" onclick="showToast('Coaching note saved for Vikram Bose','success')">Coach →</button></td></tr>
+            <tr><td><strong>Priya Kapoor</strong></td><td>6</td><td>83%</td><td>★ 4.1</td><td><div class="pw"><div class="pf" style="width:83%;background:var(--insight)"></div></div></td><td>Today 08:00</td><td><button class="btn bg bsm" onclick="showToast('Brief opened for Priya Kapoor','success')">View brief →</button></td></tr>
+            <tr><td><strong>Arjun Nair</strong></td><td>2</td><td>40%</td><td>—</td><td><div class="pw"><div class="pf" style="width:40%;background:var(--danger)"></div></div></td><td>3 days ago</td><td><button class="btn bg bsm" onclick="showToast('Coaching note saved for Arjun Nair','success')">Coach →</button></td></tr>
+            <tr><td><strong>Sneha Reddy</strong></td><td>9</td><td>100%</td><td>★ 4.8</td><td><div class="pw"><div class="pf" style="width:100%;background:var(--insight)"></div></div></td><td>Today 08:45</td><td><button class="btn bg bsm" onclick="showToast('Brief opened for Sneha Reddy','success')">View brief →</button></td></tr>
+          </tbody>
+        </table>
+        <div style="padding:9px 14px;background:var(--warn-light);border-top:1px solid #F3D9A0;font-size:12px;color:var(--warn);">⚠ Arjun Nair has opened only 2 of 5 generated briefs this week. Consider a coaching conversation before Friday's team review.</div>
+      </div>
+    </div>
+
+    <!-- SETTINGS SCREEN -->
+    <div id="s-settings" class="hidden">
+      <div class="topbar"><div><div class="ptitle">Settings</div><div class="psub">Manage your account, subscription, and preferences</div></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div>
+          <div class="card">
+            <div class="ch"><div class="ct">Account</div></div>
+            <div class="ig"><label class="il">Full name</label><input class="inp" id="set-name" value="Rahul Mehta"></div>
+            <div class="ig"><label class="il">Work email</label><input class="inp" id="set-email" value="rahul@techcorp.in"></div>
+            <div class="ig"><label class="il">Company</label><input class="inp" value="TechCorp India"></div>
+            <div class="ig"><label class="il">Role</label><input class="inp" value="Senior Account Executive"></div>
+            <div class="ig"><label class="il">New password (leave blank to keep current)</label><input class="inp" type="password" placeholder="••••••••"></div>
+            <button class="btn bp bsm" onclick="saveSettings()">Save changes</button>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct">Subscription</div></div>
+            <div style="font-size:15px;font-weight:600;color:var(--midnight);">Starter Plan</div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">₹999 / seat / month · Next billing: 1 July 2025</div>
+            <div style="background:var(--frost);border-radius:var(--radius);padding:9px 12px;margin:11px 0;font-size:12px;color:var(--ocean);">Growth adds: social signal monitoring, CRM integration, team dashboard, 2-hour priority support.</div>
+            <div style="display:flex;gap:8px;"><button class="btn bp bsm" onclick="showScreen('upgrade')">Upgrade →</button><button class="btn bg bsm" onclick="showToast('Billing portal opened','success')">Manage billing</button></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="ch"><div class="ct">Brief delivery</div></div>
+            <div class="tw"><label class="tgl"><input type="checkbox" checked onchange="showToast('Saved','success')"><div class="ts"></div></label><div><div class="tll">Email delivery (30 min before meeting)</div><div class="tls">Core feature — always active</div></div></div>
+            <div class="tw"><label class="tgl"><input type="checkbox" onchange="showToast('Push notifications require the mobile app (coming soon)','warn')"><div class="ts"></div></label><div><div class="tll">Mobile push notification</div><div class="tls">Requires Prelude AI mobile app (coming soon)</div></div></div>
+            <div class="tw"><label class="tgl"><input type="checkbox" onchange="showToast('Slack integration requires Growth tier','warn')"><div class="ts"></div></label><div><div class="tll">Slack DM delivery</div><div class="tls">Growth tier only</div></div></div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct">Brief sections</div></div>
+            <div class="tw"><label class="tgl"><input type="checkbox" checked onchange="showToast('Saved','success')"><div class="ts"></div></label><div><div class="tll">Company snapshot</div></div></div>
+            <div class="tw"><label class="tgl"><input type="checkbox" checked onchange="showToast('Saved','success')"><div class="ts"></div></label><div><div class="tll">Recent news (last 30 days)</div></div></div>
+            <div class="tw"><label class="tgl"><input type="checkbox" checked onchange="showToast('Saved','success')"><div class="ts"></div></label><div><div class="tll">Financial snapshot</div></div></div>
+            <div class="tw"><label class="tgl"><input type="checkbox" onchange="showToast('Social signals require Growth tier','warn')"><div class="ts"></div></label><div><div class="tll">Social signals (Growth+)</div></div></div>
+            <div class="tw"><label class="tgl"><input type="checkbox" checked onchange="showToast('Saved','success')"><div class="ts"></div></label><div><div class="tll">AI conversation starters</div></div></div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct">Calendar</div></div>
+            <div class="co connected"><span style="font-size:20px;">📅</span><div style="flex:1;"><div class="cn">Google Calendar</div><div class="cs ok">✓ Connected — rahul@techcorp.in</div></div><button class="btn bg bsm" onclick="showToast('Calendar disconnected','warn')">Disconnect</button></div>
+            <div class="co" onclick="showToast('Connecting to Microsoft 365...','');setTimeout(()=>showToast('Microsoft 365 connected ✓','success'),1500)"><span style="font-size:20px;">📧</span><div style="flex:1;"><div class="cn">Microsoft 365</div><div class="cs">Not connected</div></div><button class="btn bp bsm">Connect →</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPGRADE SCREEN -->
+    <div id="s-upgrade" class="hidden">
+      <div class="topbar"><div><div class="ptitle">Upgrade your plan</div><div class="psub">Choose the plan that fits your team</div></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;">
+        <div class="card" style="position:relative;">
+          <div style="font-weight:700;font-size:15px;color:var(--midnight);">Starter</div>
+          <div style="font-size:26px;font-weight:800;color:var(--midnight);">₹999<span style="font-size:12px;font-weight:400;color:var(--gray-500);">/seat/mo</span></div>
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:14px;">No commitment · Cancel any time</div>
+          <div style="font-size:12px;color:var(--gray-600);line-height:2.1;">✓ Unlimited briefs<br>✓ News + financial data<br>✓ Email delivery<br>✓ Conversation starters<br>✓ Post-meeting rating<br>✗ Social signals<br>✗ CRM integration<br>✗ Team dashboard</div>
+          <button class="btn bs bfw" style="margin-top:14px;" disabled>Current plan</button>
+        </div>
+        <div class="card" style="border:2px solid var(--ocean);position:relative;">
+          <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--ocean);color:white;font-size:9px;font-weight:700;padding:3px 11px;border-radius:10px;white-space:nowrap;">MOST POPULAR</div>
+          <div style="font-weight:700;font-size:15px;color:var(--midnight);">Growth</div>
+          <div style="font-size:26px;font-weight:800;color:var(--midnight);">₹2,499<span style="font-size:12px;font-weight:400;color:var(--gray-500);">/seat/mo</span></div>
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:14px;">Save 20% with annual — ₹23,990/yr</div>
+          <div style="font-size:12px;color:var(--gray-600);line-height:2.1;">✓ All Starter features<br>✓ Social signal monitoring<br>✓ HubSpot + Salesforce CRM<br>✓ Team dashboard<br>✓ 2-hour priority support<br>✓ Live chat (business hours)<br>✓ Weekly team digest<br>✓ Brief analytics</div>
+          <button class="btn bp bfw" style="margin-top:14px;" onclick="showPaymentModal()">Upgrade to Growth →</button>
+        </div>
+        <div class="card" style="position:relative;">
+          <div style="font-weight:700;font-size:15px;color:var(--midnight);">Enterprise</div>
+          <div style="font-size:26px;font-weight:800;color:var(--midnight);">Custom</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:14px;">From ₹1,50,000/year · 20+ seats</div>
+          <div style="font-size:12px;color:var(--gray-600);line-height:2.1;">✓ All Growth features<br>✓ Dedicated account manager<br>✓ Custom data sources<br>✓ API access<br>✓ SSO / SAML integration<br>✓ SOC 2 compliance<br>✓ Quarterly business reviews<br>✓ SLA-backed uptime</div>
+          <button class="btn bs bfw" style="margin-top:14px;" onclick="showToast('Our team will reach out within 24 hours','success')">Contact sales →</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+<!-- FULL BRIEF OVERLAY -->
+<div class="bf" id="full-brief">
+  <div class="bfbar">
+    <div style="display:flex;align-items:center;gap:8px;"><div class="bars" style="height:17px;"><div class="bar b1" style="height:8px;"></div><div class="bar b2" style="height:12px;"></div><div class="bar b3" style="height:17px;"></div></div><span style="font-family:var(--serif);font-size:14px;color:white;margin-left:6px;">Prelude AI — Meeting Brief</span></div>
+    <button class="btn bs bsm" onclick="closeFull()">✕ Close</button>
+  </div>
+  <div class="bfi" id="brief-content"></div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="ov hidden" id="pay-ov">
+  <div class="modal" style="max-width:520px;">
+    <div class="mh"><div class="mt">Upgrade to Growth</div><button class="btn bg bsm" onclick="closePay()">✕</button></div>
+    <div class="mb">
+      <div class="ps">
+        <div style="font-weight:600;font-size:14px;color:var(--midnight);margin-bottom:3px;">Prelude AI — Growth Plan</div>
+        <div class="pp">₹2,499 <span>/ seat / month</span></div>
+        <div style="margin-top:8px;">
+          <div class="pf2">✓ Everything in Starter — unlimited briefs, news and financials</div>
+          <div class="pf2">✓ Social signal monitoring (LinkedIn and Twitter/X)</div>
+          <div class="pf2">✓ CRM integration — HubSpot and Salesforce</div>
+          <div class="pf2">✓ Team dashboard for sales managers</div>
+          <div class="pf2">✓ 2-hour priority support and live chat</div>
+        </div>
+      </div>
+      <div class="ig"><label class="il">Name on card</label><input class="inp" id="pay-name" placeholder="Rahul Mehta"></div>
+      <div class="ig"><label class="il">Card number</label><input class="inp" id="pay-num" placeholder="4242 4242 4242 4242" oninput="fmtCard(this)" maxlength="19"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;">
+        <div class="ig"><label class="il">Expiry (MM/YY)</label><input class="inp" id="pay-exp" placeholder="12 / 27" maxlength="7"></div>
+        <div class="ig"><label class="il">CVC</label><input class="inp" id="pay-cvc" placeholder="123" maxlength="3"></div>
+      </div>
+      <div class="ig"><label class="il">Billing email</label><input class="inp" id="pay-email" placeholder="rahul@techcorp.in"></div>
+      <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">🔒 Secured by Stripe. We never store card details. Cancel any time from Settings.<br>Test card: <strong>4242 4242 4242 4242</strong> · Any future expiry · Any 3-digit CVC</div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="closePay()">Cancel</button><button class="btn bp blg" id="pay-btn" onclick="doPay()">Pay ₹2,499 →</button></div>
+  </div>
+</div>
+
+<!-- NOTIF PANEL -->
+<div class="ov hidden" id="notif-ov" onclick="this.classList.add('hidden')">
+  <div class="modal" style="max-width:360px;position:absolute;top:58px;right:18px;" onclick="event.stopPropagation()">
+    <div class="mh" style="padding:13px 16px;"><div class="mt" style="font-size:16px;">Notifications</div><button class="btn bg bsm" onclick="document.getElementById('notif-ov').classList.add('hidden')">✕</button></div>
+    <div style="padding:6px 0;">
+      <div style="padding:11px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;" onclick="openFull('infosys');document.getElementById('notif-ov').classList.add('hidden')"><div style="font-size:13px;font-weight:500;color:var(--midnight);">⚡ Brief delivered — Infosys Limited</div><div style="font-size:11px;color:var(--gray-400);margin-top:1px;">Today at 08:30 · Meeting in 30 minutes</div></div>
+      <div style="padding:11px 16px;border-bottom:1px solid var(--gray-100);"><div style="font-size:13px;font-weight:500;color:var(--midnight);">👥 Arjun Nair — low brief engagement</div><div style="font-size:11px;color:var(--gray-400);margin-top:1px;">Only 2 of 5 briefs opened this week</div></div>
+      <div style="padding:11px 16px;"><div style="font-size:13px;font-weight:500;color:var(--midnight);">📊 Weekly digest ready</div><div style="font-size:11px;color:var(--gray-400);margin-top:1px;">24 briefs · 12 hours saved · 4.3 avg rating</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOUR SYSTEM -->
+<div id="tour-overlay" class="hidden">
+  <div class="tour-backdrop" onclick="endTour()"></div>
+  <div class="highlight-ring" id="tour-ring"></div>
+  <div class="tour-box" id="tour-box">
+    <div class="tour-step" id="tour-step-label">Step 1 of 8</div>
+    <div class="tour-title" id="tour-title">Welcome to Prelude AI</div>
+    <div class="tour-desc" id="tour-desc">Let's take a quick tour of the key features.</div>
+    <div class="tour-dots" id="tour-dots"></div>
+    <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;">
+      <button class="btn bg bsm" onclick="endTour()">Skip tour</button>
+      <div style="display:flex;gap:6px;">
+        <button class="btn bs bsm" id="tour-prev" onclick="tourStep(tourIdx-1)">← Back</button>
+        <button class="btn bp bsm" id="tour-next" onclick="tourStep(tourIdx+1)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast-wrap"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+const S = {
+  user:{name:'Rahul Mehta',email:'rahul@techcorp.in',company:'TechCorp India',plan:'starter'},
+  calConnected:false, genIv:null, calView:'month',
+  calOffset:0, ratings:{}, tourIdx:0
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════
+function showToast(msg,type=''){
+  const c=document.getElementById('toast-wrap');
+  const t=document.createElement('div');
+  t.className='toast'+(type?' '+type:'');
+  const ic=type==='success'?'✓':type==='warn'?'⚠':type==='error'?'✕':'ℹ';
+  t.innerHTML='<span style="font-size:15px;">'+ic+'</span><span>'+msg+'</span>';
+  c.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='.3s';setTimeout(()=>t.remove(),310);},3400);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════════
+function doSignIn(){
+  const e=document.getElementById('si-email').value.trim();
+  const p=document.getElementById('si-pw').value;
+  if(!e||!e.includes('@')){showToast('Please enter a valid email address','error');return;}
+  if(!p){showToast('Please enter your password','error');return;}
+  showToast('Signing you in...','');
+  setTimeout(()=>enterApp(),900);
+}
+function switchToSignup(){
+  document.getElementById('ob-signin').classList.add('hidden');
+  document.getElementById('ob-signup').classList.remove('hidden');
+}
+function switchToSignin(){
+  document.getElementById('ob-signup').classList.add('hidden');
+  document.getElementById('ob-signin').classList.remove('hidden');
+}
+function suStep(n){
+  if(n===2){
+    const fn=document.getElementById('su-fn').value.trim();
+    const ln=document.getElementById('su-ln').value.trim();
+    const em=document.getElementById('su-email').value.trim();
+    const co=document.getElementById('su-company').value.trim();
+    const ro=document.getElementById('su-role').value;
+    const pw=document.getElementById('su-pw').value;
+    const pw2=document.getElementById('su-pw2').value;
+    if(!fn||!ln){showToast('Please enter your full name','error');return;}
+    if(!em||!em.includes('@')){showToast('Please enter a valid work email address','error');return;}
+    if(!co){showToast('Please enter your company name','error');return;}
+    if(!ro){showToast('Please select your role','error');return;}
+    if(pw.length<8){showToast('Password must be at least 8 characters','error');return;}
+    if(pw!==pw2){showToast('Passwords do not match','error');return;}
+    S.user.name=fn+' '+ln;
+    S.user.email=em;
+    S.user.company=co;
+  }
+  if(n===3&&!S.calConnected){
+    // allowed to skip
+  }
+  ['su1','su2','su3'].forEach((id,i)=>document.getElementById(id).classList.toggle('hidden',i+1!==n));
+}
+function connectCal(type){
+  const btn=document.getElementById('c'+type+'b');
+  const st=document.getElementById('c'+type+'s');
+  const opt=document.getElementById('cal-'+type);
+  btn.textContent='Connecting...';btn.disabled=true;
+  setTimeout(()=>{
+    opt.classList.add('connected');
+    st.textContent='✓ Connected — '+(type==='g'?S.user.email:'rahul@techcorp.com')+' · Read-only';
+    st.className='cs ok';btn.textContent='Connected ✓';
+    S.calConnected=true;
+    document.getElementById('cal-cont').disabled=false;
+    showToast((type==='g'?'Google Calendar':'Microsoft 365')+' connected ✓','success');
+  },1100);
+}
+function enterApp(){
+  document.getElementById('ob-screen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('sb-name').textContent=S.user.name;
+  document.getElementById('sb-email').textContent=S.user.email;
+  setGreeting();
+  showToast('Welcome to Prelude AI, '+S.user.name.split(' ')[0]+'! 🎉','success');
+  setTimeout(runGen,800);
+  buildCal();
+  buildNews();
+  setTimeout(()=>startTour(),1200);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+function showScreen(id){
+  ['dashboard','briefs','calendar','news','notes','coach','team','settings','upgrade'].forEach(s=>{
+    document.getElementById('s-'+s)?.classList.toggle('hidden',s!==id);
+    document.getElementById('n-'+s)?.classList.toggle('active',s===id);
+  });
+  if(window.innerWidth<=768) document.getElementById('sb').classList.remove('open');
+}
+function setGreeting(){
+  const h=new Date().getHours();
+  const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  const el=document.getElementById('greeting');
+  if(el)el.textContent=g+', '+S.user.name.split(' ')[0];
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BRIEF CARDS
+// ═══════════════════════════════════════════════════════════════════
+function toggleBC(id){document.getElementById(id)?.classList.toggle('open');}
+function rate(id,n){
+  document.querySelectorAll('#'+id+' .star').forEach((s,i)=>s.classList.toggle('on',i<n));
+  S.ratings[id]=n;
+  showToast('Brief rated '+n+'/5 — thank you!','success');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// GENERATION ANIMATION
+// ═══════════════════════════════════════════════════════════════════
+function runGen(){
+  document.getElementById('rp')?.classList.add('open');
+  const ids=['g1','g2','g3','g4','g5','g6','g7','g8'];
+  let i=2;
+  clearInterval(S.genIv);
+  S.genIv=setInterval(()=>{
+    if(i>=ids.length){
+      clearInterval(S.genIv);
+      document.getElementById('g8').className='gst done';
+      const b=document.getElementById('rp-badge');
+      if(b){b.textContent='✓ Delivered';b.className='badge bg2';}
+      showToast('Your Razorpay brief is ready! Check your inbox.','success');
+      return;
+    }
+    document.getElementById(ids[i-1]).className='gst done';
+    document.getElementById(ids[i]).className='gst act';
+    i++;
+  },1200);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FULL BRIEF DATA
+// ═══════════════════════════════════════════════════════════════════
+const briefs={
+  infosys:{
+    name:'Infosys Limited',meeting:'Thursday 5 June 2025 · 09:00',gen:'08:30',
+    snapshot:`Infosys Limited is a global IT services and consulting company headquartered in Bengaluru, Karnataka, India. Founded on 2 July 1981 by N.R. Narayana Murthy along with six co-founders — Nandan Nilekani, S. Gopalakrishnan, S.D. Shibulal, K. Dinesh, N.S. Raghavan, and Ashok Arora — with an initial capital of ₹10,000. The company now employs approximately 343,000 professionals across 56 countries and serves clients in over 45 countries. Infosys is listed on the Bombay Stock Exchange (BSE), National Stock Exchange (NSE), and the New York Stock Exchange (NYSE: INFY).`,
+    snap_src:'Clearbit Enrichment API + Infosys Annual Report FY2025 · 5 Jun 2025',
+    leaders:[
+      {name:'Salil Parekh',title:'CEO & Managing Director',note:'Joined Jan 2018. Previous MD at Capgemini. Known for large deal strategy and conservative guidance style.'},
+      {name:'Nilanjan Roy',title:'Chief Financial Officer',note:'CFO since Feb 2019. Key contact for commercial discussions at enterprise scale.'},
+      {name:'Mohit Joshi',title:'CEO — Infosys BPM',note:'Leads the BPM division. Relevant if your solution integrates with outsourced processes.'},
+      {name:'Nandan Nilekani',title:'Non-Executive Chairman',note:'Co-founder. Spearheaded Aadhaar (India Stack). Significant influence on digital strategy.'},
+    ],
+    fin:[
+      {l:'Revenue FY25',v:'$18.6B'},{l:'YoY Growth',v:'+4.2%'},{l:'Net Margin',v:'16.8%'},{l:'Market Cap',v:'~$76B'},
+    ],
+    fin_note:'FY26 guidance: 0–3% revenue growth. Management cited macroeconomic uncertainty and selective client spending as key factors. Avoid pushing for large upfront commitments in early meetings.',
+    fin_src:'Yahoo Finance API + Infosys Q4 FY25 Press Release · 4 Jun 2025',
+    news:[
+      {h:'Infosys announces strategic AI partnership with Microsoft Azure for cloud migration and AI-powered enterprise services',d:'Economic Times · 28 May 2025',s:'→ Confirms AI-first pivot. Reference the Topaz AI platform — using this vocabulary signals you understand their roadmap.'},
+      {h:'Q4 FY25 revenue beats analyst estimates at $18.6B; CEO Salil Parekh signals BFSI and manufacturing as priority deal segments for FY26',d:'Business Standard · 18 May 2025',s:'→ BFSI focus is significant. If your product has BFSI use cases, lead with those examples rather than generic capabilities.'},
+      {h:'Infosys launches \'Topaz\' — a proprietary AI platform designed to help enterprise clients accelerate AI adoption across operations',d:'The Hindu BusinessLine · 2 May 2025',s:'→ Topaz is their flagship AI product. Familiarity with this platform will differentiate you from vendors who haven\'t done their homework.'},
+    ],
+    starters:[
+      '"I saw the Microsoft Azure partnership announcement last week — how is the Topaz AI platform landing internally with your teams? Are enterprise clients already asking for it specifically?"',
+      '"With FY26 guidance set conservatively at 0–3%, are you finding clients pulling back on discretionary spend this year, or is there still strong appetite for initiatives that show clear ROI within 12 months?"',
+    ]
+  },
+  hdfc:{
+    name:'HDFC Bank',meeting:'Wednesday 4 June 2025 · 15:30',gen:'15:00',
+    snapshot:`HDFC Bank is India's largest private sector bank by assets and market capitalisation, headquartered in Mumbai, Maharashtra. Founded on 30 August 1994 as a subsidiary of Housing Development Finance Corporation (HDFC), the bank operates 8,738 branches and over 20,000 ATMs as of March 2025. HDFC Bank completed its merger with HDFC Ltd on 1 July 2023, creating one of the largest financial conglomerates in Asia. Listed on BSE, NSE, and NYSE (HDB).`,
+    snap_src:'Clearbit + HDFC Bank Annual Report FY2025 · 4 Jun 2025',
+    leaders:[
+      {name:'Sashidhar Jagdishan',title:'MD & Chief Executive Officer',note:'CEO since October 2020, former CFO. Focused on technology-led transformation and branch expansion.'},
+      {name:'Srinivasan Vaidyanathan',title:'Chief Financial Officer',note:'Key contact for enterprise-level vendor discussions involving budget approval.'},
+      {name:'Rahul Shukla',title:'Group Head — Corporate & Institutional Banking',note:'Directly relevant if your meeting is about corporate banking solutions.'},
+      {name:'Smita Bhagat',title:'Group Head — Inclusive Banking, Govt & E-Commerce',note:'Leads digital and government banking partnerships.'},
+    ],
+    fin:[
+      {l:'Net Profit FY25',v:'₹64,062 Cr'},{l:'NIM',v:'3.46%'},{l:'GNPA',v:'1.24%'},{l:'Market Cap',v:'~$160B'},
+    ],
+    fin_note:'HDFC Bank reported strong profitability in FY25. Net interest margin (NIM) remains above sector average. Gross NPA at 1.24% reflects disciplined credit quality. Strong capital adequacy (CAR: 18.8%) gives room for strategic investments.',
+    fin_src:'HDFC Bank Q4 FY25 Results + NSE Filing · 3 Jun 2025',
+    news:[
+      {h:'HDFC Bank accelerates technology hiring, plans to add 2,000 tech professionals in FY26 to support digital transformation',d:'Mint · 1 Jun 2025',s:'→ Active investment in tech signals openness to new vendor solutions. Frame your pitch around their digital transformation agenda.'},
+      {h:'HDFC Bank posts record quarterly net profit of ₹16,512 crore in Q4 FY25, up 22% year on year',d:'Business Today · 19 May 2025',s:'→ Strong financial performance means available budget. They are in investment mode, not cost-cutting mode.'},
+      {h:'HDFC Bank launches \'SmartHub Vyapar\' super-app for 15 million MSMEs, targeting deeper penetration in Tier 2 and Tier 3 cities',d:'Economic Times · 5 May 2025',s:'→ MSME and Tier 2/3 expansion is a strategic priority. If your product serves these segments, this is a strong alignment point.'},
+    ],
+    starters:[
+      '"I saw the SmartHub Vyapar MSME app launch — are you finding that Tier 2 and Tier 3 city customers engage with digital products differently than metro clients?"',
+      '"With the technology hiring push in FY26, are you building more capabilities in-house, or are you also looking at strategic vendor partnerships for specific capability gaps?"',
+    ]
+  },
+  zomato:{
+    name:'Zomato',meeting:'Monday 2 June 2025 · 11:00',gen:'10:30',
+    snapshot:`Zomato Limited is an Indian food delivery and restaurant discovery platform headquartered in Gurugram, Haryana. Founded in 2008 by Deepinder Goyal and Pankaj Chaddah as Foodiebay, the company rebranded to Zomato in 2010. The platform operates in over 800 cities in India and processes approximately 8 million orders per day. In 2022, Zomato acquired Blinkit (formerly Grofers) for ₹4,447 crore, entering the quick commerce segment. Listed on BSE and NSE since July 2021 (ticker: ZOMATO).`,
+    snap_src:'Clearbit + Zomato Q3 FY25 Investor Presentation · 2 Jun 2025',
+    leaders:[
+      {name:'Deepinder Goyal',title:'Founder & Chief Executive Officer',note:'Visionary founder. Known for bold bets — Blinkit acquisition, District app. Very active on LinkedIn.'},
+      {name:'Akshant Goyal',title:'Chief Financial Officer',note:'Joined from McKinsey. Focus on unit economics and path to sustainable profitability.'},
+      {name:'Albinder Dhindsa',title:'CEO — Blinkit',note:'Leads Zomato\'s fastest-growing business unit (quick commerce).'},
+    ],
+    fin:[
+      {l:'Revenue Q3 FY25',v:'₹5,405 Cr'},{l:'QoQ Growth',v:'+69%'},{l:'Adj. EBITDA',v:'Positive'},{l:'Market Cap',v:'~$25B'},
+    ],
+    fin_note:'Zomato achieved adjusted EBITDA profitability ahead of schedule. Blinkit is now the primary growth engine, outpacing the core food delivery business in growth rate. Management is investing aggressively in Blinkit dark store expansion.',
+    fin_src:'Zomato Q3 FY25 Earnings Release + BSE Filing · 1 Jun 2025',
+    news:[
+      {h:'Zomato launches \'District\' — an events and experiences platform targeting urban India\'s lifestyle and entertainment segment',d:'Economic Times · 25 May 2025',s:'→ District signals Zomato\'s ambition beyond food. They are building a super-app for urban India. Frame your pitch in terms of how it fits this bigger vision.'},
+      {h:'Blinkit reaches 1,000 dark store milestone; Zomato targets 2,000 stores by end of FY26 amid fierce competition from Swiggy Instamart and Zepto',d:'Mint · 15 May 2025',s:'→ Quick commerce expansion is a top priority. Operational and tech infrastructure investment is accelerating.'},
+    ],
+    starters:[
+      '"The District launch looks like a bold move into events and experiences — how does that fit into Zomato\'s longer-term vision? Is it primarily about engagement or is there a direct monetisation path you\'re excited about?"',
+      '"With Blinkit racing to 2,000 dark stores, are you finding that your biggest operational challenge is physical infrastructure, or is it the technology layer that\'s stretching the team?"',
+    ]
+  },
+  tcs:{
+    name:'Tata Consultancy Services',meeting:'Sunday 1 June 2025 · 14:00',gen:'13:30',
+    snapshot:`Tata Consultancy Services (TCS) is a global IT services, consulting, and business solutions company headquartered in Mumbai, Maharashtra. Founded in 1968 as a division of Tata Sons, TCS became a publicly listed entity in 2004. With approximately 612,000 employees across 55 countries, TCS is the largest IT services company in India and one of the most valuable companies in Asia by market capitalisation. TCS is listed on BSE and NSE (TCS).`,
+    snap_src:'Clearbit + TCS Annual Report FY2025 · 1 Jun 2025',
+    leaders:[
+      {name:'K. Krithivasan',title:'Chief Executive Officer & MD',note:'CEO since June 2023. Previously led BFSI vertical. Strong focus on AI and cloud transformation.'},
+      {name:'Samir Seksaria',title:'Chief Financial Officer',note:'Key contact for large enterprise commercial discussions.'},
+      {name:'Milind Lakkad',title:'Chief HR Officer',note:'Leads TCS\'s 600,000+ workforce strategy — relevant if your solution has HR or workforce implications.'},
+    ],
+    fin:[
+      {l:'Revenue FY25',v:'$29.1B'},{l:'YoY Growth',v:'+4.5%'},{l:'Net Margin',v:'19.1%'},{l:'Market Cap',v:'~$165B'},
+    ],
+    fin_note:'TCS revenue surpassed $29B in FY25 with industry-leading margins of 19.1%. The company has guided for 5–7% growth in FY26, driven by AI and cloud transformation deals. TCS has ₹60,000+ crore in cash on its balance sheet — highly acquisitive profile.',
+    fin_src:'TCS Q4 FY25 Earnings Call Transcript + NSE Filing · 31 May 2025',
+    news:[
+      {h:'TCS wins $1.5 billion multi-year AI transformation contract with a leading European banking group',d:'Business Standard · 20 May 2025',s:'→ Large deal momentum is strong. They are winning on AI transformation — align your pitch to how your solution complements or enables AI-led delivery.'},
+      {h:'TCS launches \'TCS AI WisdomNext\' — an enterprise AI platform combining generative AI with the company\'s industry IP',d:'NDTV Profit · 8 May 2025',s:'→ WisdomNext is their flagship AI product. Understanding this helps you speak their language in the meeting.'},
+    ],
+    starters:[
+      '"TCS just announced a $1.5B AI transformation deal in Europe — is your team finding that AI transformation conversations are opening up new deal sizes and structures that didn\'t exist 18 months ago?"',
+      '"With WisdomNext as your AI platform, how are you navigating the challenge of standardising AI delivery at scale versus the bespoke requirements that enterprise clients typically demand?"',
+    ]
+  },
+  paytm:{
+    name:'Paytm (One97 Communications)',meeting:'Thursday 30 May 2025 · 10:00',gen:'09:30',
+    snapshot:`Paytm, operated by One97 Communications Limited, is India's largest digital payments and financial services platform, headquartered in Noida, Uttar Pradesh. Founded in 2010 by Vijay Shekhar Sharma, Paytm pioneered the QR code-based payment ecosystem in India and now processes over 1 billion monthly transactions. The company listed on BSE and NSE in November 2021 and has navigated significant regulatory challenges including the RBI's action on Paytm Payments Bank in early 2024.`,
+    snap_src:'Clearbit + One97 Communications Q3 FY25 Filing + RBI Directives · 30 May 2025',
+    leaders:[
+      {name:'Vijay Shekhar Sharma',title:'Founder, MD & CEO',note:'Highly entrepreneurial. Strong public profile. RBI banking restrictions have been a significant challenge in 2024.'},
+      {name:'Madhur Deora',title:'President & Group CFO',note:'Key commercial contact. Previously at Sequoia Capital.'},
+    ],
+    fin:[
+      {l:'Revenue Q3 FY25',v:'₹1,828 Cr'},{l:'YoY Change',v:'-36%'},{l:'EBITDA',v:'₹-208 Cr'},{l:'Market Cap',v:'~$4.5B'},
+    ],
+    fin_note:'Paytm is navigating a significant revenue decline following the RBI action on Paytm Payments Bank in January 2024. The company has been restructuring its business around merchant payments, distribution, and financial services. Management has guided for profitability by Q1 FY26.',
+    fin_src:'One97 Communications Q3 FY25 Results + NSE Filing · 29 May 2025',
+    news:[
+      {h:'Paytm restructures business post-RBI action; shifts focus to merchant services and third-party financial product distribution',d:'Mint · 22 May 2025',s:'→ The company is in a pivot. Be sensitive to this context — avoid framing your pitch around banking or payments products that have been restricted.'},
+      {h:'Paytm partners with Axis Bank and HDFC Bank to continue UPI payment services following Payments Bank shutdown',d:'Economic Times · 12 May 2025',s:'→ Partnership model is the new distribution strategy. If your product helps with partner ecosystem management or distribution, this is directly relevant.'},
+    ],
+    starters:[
+      '"With the business restructuring over the past year, where is the team most focused for FY26 — merchant payments, financial product distribution, or something else entirely?"',
+      '"The pivot to third-party financial product distribution is an interesting strategic direction — are you building that primarily through bank partnerships, or are you also exploring direct enterprise channels?"',
+    ]
+  },
+  swiggy:{
+    name:'Swiggy',meeting:'Tuesday 28 May 2025 · 09:30',gen:'09:00',
+    snapshot:`Swiggy is an Indian on-demand convenience and food delivery platform headquartered in Bengaluru, Karnataka. Founded in 2014 by Sriharsha Majety, Nandan Reddy, and Rahul Jaimini, Swiggy operates across food delivery, quick commerce (Instamart), and dining-out discovery. The company listed on BSE and NSE in November 2024 at a valuation of approximately $11.3 billion, one of India's largest tech IPOs of 2024.`,
+    snap_src:'Clearbit + Swiggy IPO Prospectus + Q1 FY26 Investor Update · 28 May 2025',
+    leaders:[
+      {name:'Sriharsha Majety',title:'Co-founder & Chief Executive Officer',note:'Co-founder and CEO. Highly operational. Competed intensely with Zomato and Blinkit since 2022.'},
+      {name:'Rahul Bothra',title:'Chief Financial Officer',note:'Led Swiggy through its IPO. Key commercial contact for enterprise-level engagements.'},
+    ],
+    fin:[
+      {l:'Revenue FY25',v:'₹15,227 Cr'},{l:'YoY Growth',v:'+34%'},{l:'Net Loss',v:'₹-3,351 Cr'},{l:'Market Cap',v:'~₹1.05L Cr'},
+    ],
+    fin_note:'Swiggy is in high-growth mode post-IPO, investing aggressively in Instamart dark store expansion to compete with Blinkit. The company is not yet profitable but management has guided for adjusted EBITDA breakeven by Q3 FY26.',
+    fin_src:'Swiggy Q1 FY26 Results + SEBI Filing · 27 May 2025',
+    news:[
+      {h:'Swiggy Instamart expands to 100+ cities, doubles dark store count to 660 as quick commerce battle with Blinkit intensifies',d:'Business Standard · 20 May 2025',s:'→ Rapid expansion means operational and tech infrastructure is under pressure. If your product addresses scaling challenges, this is your opening.'},
+      {h:'Swiggy launches \'Snacc\' — a short-video platform for food content creators, targeting Gen Z users',d:'Hindustan Times · 10 May 2025',s:'→ Bold product bet outside core delivery. Shows appetite for platform diversification.'},
+    ],
+    starters:[
+      '"With Instamart now in 100+ cities, are you finding that the biggest challenge is physical infrastructure — dark stores and last-mile — or is the technology stack and operations at scale the harder problem?"',
+      '"The \'Snacc\' short-video launch is a bold move — is the hypothesis that food content drives order conversion, or is this more about longer-term Gen Z platform engagement?"',
+    ]
+  }
+};
+
+function openFull(id){
+  const d=briefs[id];
+  if(!d){showToast('Brief not available','warn');return;}
+  const html=`
+    <div style="background:var(--frost);border-radius:var(--radius);padding:11px 14px;margin-bottom:22px;font-size:13px;color:var(--ocean);">
+      <strong>${d.name}</strong> &nbsp;·&nbsp; Meeting: ${d.meeting} &nbsp;·&nbsp; Generated at: ${d.gen} &nbsp;·&nbsp; <span style="color:var(--insight);">Delivered on time ✓</span>
+    </div>
+    <div class="bfs"><h4>Company Snapshot</h4>
+      <div style="font-size:14px;line-height:1.75;color:var(--text);">${d.snapshot}</div>
+      <div style="font-size:11px;color:var(--gray-400);margin-top:5px;">Source: ${d.snap_src}</div>
+    </div>
+    <div class="bfs"><h4>Leadership Team</h4>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+        ${d.leaders.map(l=>`<div style="background:var(--gray-50);border-radius:var(--radius);padding:11px 13px;border:1px solid var(--gray-200);">
+          <div style="font-weight:600;font-size:13px;color:var(--midnight);">${l.name}</div>
+          <div style="font-size:11px;color:var(--ocean);margin:2px 0;">${l.title}</div>
+          <div style="font-size:12px;color:var(--gray-600);margin-top:4px;line-height:1.5;">${l.note}</div>
+        </div>`).join('')}
+      </div>
+      <div style="font-size:11px;color:var(--gray-400);margin-top:6px;">Source: ${d.snap_src}</div>
+    </div>
+    <div class="bfs"><h4>Financial Snapshot</h4>
+      <div class="fin" style="margin-bottom:9px;">${d.fin.map(f=>`<div class="fi"><div class="fl">${f.l}</div><div class="fv">${f.v}</div></div>`).join('')}</div>
+      <div style="font-size:12px;color:var(--gray-600);line-height:1.6;background:var(--gray-50);border-radius:var(--radius);padding:9px 12px;">${d.fin_note}</div>
+      <div style="font-size:11px;color:var(--gray-400);margin-top:5px;">Source: ${d.fin_src}</div>
+    </div>
+    <div class="bfs"><h4>Recent News (last 30 days)</h4>
+      ${d.news.map(n=>`<div class="ni2" style="margin-bottom:13px;padding-bottom:13px;">
+        <div class="nh" style="font-size:14px;">${n.h}</div>
+        <div class="nd">${n.d}</div>
+        <div class="ns" style="font-size:13px;margin-top:4px;">${n.s}</div>
+      </div>`).join('')}
+    </div>
+    <div class="bfs"><h4>AI Conversation Starters</h4>
+      ${d.starters.map(s=>`<div class="starter2" style="font-size:14px;margin-bottom:10px;">${s}</div>`).join('')}
+    </div>
+    <div style="border-top:1px solid var(--gray-200);padding-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--gray-400);">
+      <span>All facts sourced and dated. Verify independently before quoting in a formal proposal or contract.</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span>Rate:</span>
+        <div class="stars" id="full-st-${id}">${[1,2,3,4,5].map(i=>`<span class="star ${i<=4?'on':''}" onclick="rate('full-st-${id}',${i})">★</span>`).join('')}</div>
+      </div>
+    </div>`;
+  document.getElementById('brief-content').innerHTML=html;
+  document.getElementById('full-brief').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeFull(){document.getElementById('full-brief').classList.remove('open');document.body.style.overflow='';}
+
+// ═══════════════════════════════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════════════════════════════
+const calMeetings={
+  '2025-06-05':['Infosys 09:00 (Brief ready)','Razorpay 14:00 (Generating)'],
+  '2025-06-06':['Wipro 10:00','Paytm 15:00'],
+  '2025-06-07':['PhonePe 15:00'],
+  '2025-06-08':['Ola Electric 11:00'],
+  '2025-06-09':['No meetings'],
+  '2025-06-10':['Tata Steel 14:00'],
+  '2025-06-11':['HCL Tech 09:30'],
+  '2025-06-12':['MakeMyTrip 11:00','Flipkart 16:00'],
+  '2025-06-13':['InMobi 10:00'],
+  '2025-06-16':['Policy Bazaar 14:30'],
+  '2025-06-17':['Delhivery 09:00'],
+  '2025-06-18':['Ola Cabs 10:00','Freshworks 15:00'],
+  '2025-06-19':['Meesho 11:00'],
+  '2025-06-23':['CRED 14:00'],
+  '2025-06-24':['Dream11 10:00'],
+  '2025-06-25':['BigBasket 09:30','Lenskart 16:00'],
+  '2025-06-26':['Nykaa 11:00'],
+  '2025-06-30':['Quarter close review'],
+};
+function buildCal(){
+  const now=new Date(2025,5,5); // June 5 2025
+  const d=new Date(now.getFullYear(),now.getMonth()+S.calOffset,1);
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-title').textContent=months[d.getMonth()]+' '+d.getFullYear();
+  if(S.calView==='month') renderMonth(d);
+  else renderWeek(now);
+}
+function renderMonth(d){
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const firstDay=d.getDay();
+  const daysInMonth=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  const prevDays=new Date(d.getFullYear(),d.getMonth(),0).getDate();
+  let html='<div class="cal-grid">';
+  days.forEach(dy=>html+=`<div class="cal-head">${dy}</div>`);
+  for(let i=0;i<firstDay;i++){
+    const dn=prevDays-firstDay+1+i;
+    html+=`<div class="cal-day other-month"><div class="cal-num">${dn}</div></div>`;
+  }
+  for(let i=1;i<=daysInMonth;i++){
+    const dateStr=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(i).padStart(2,'0');
+    const isToday=(d.getMonth()===5&&d.getFullYear()===2025&&i===5);
+    const meets=calMeetings[dateStr]||[];
+    html+=`<div class="cal-day${isToday?' today':''}" onclick="showToast('${dateStr}: ${meets.length?meets.join(', '):'No meetings'}','')">
+      <div class="cal-num">${i}</div>
+      ${meets.slice(0,2).map((m,mi)=>`<div class="cal-evt ${mi===0?'ce-green':mi===1?'ce-blue':'ce-gray'}">${m.split(' ').slice(0,2).join(' ')}</div>`).join('')}
+      ${meets.length>2?`<div class="cal-evt ce-gray">+${meets.length-2} more</div>`:''}
+    </div>`;
+  }
+  const remaining=(7-((firstDay+daysInMonth)%7))%7;
+  for(let i=1;i<=remaining;i++) html+=`<div class="cal-day other-month"><div class="cal-num">${i}</div></div>`;
+  html+='</div>';
+  html+=`<div style="display:flex;gap:10px;margin-top:8px;font-size:12px;color:var(--gray-500);">
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:var(--insight-light);border-radius:2px;display:inline-block;"></span>Brief delivered</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:var(--frost);border-radius:2px;display:inline-block;"></span>Brief generating</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:var(--gray-100);border-radius:2px;display:inline-block;"></span>Scheduled</span>
+  </div>`;
+  document.getElementById('cal-body').innerHTML=html;
+}
+function renderWeek(now){
+  const weekDays=['Mon','Tue','Wed','Thu','Fri'];
+  const times=['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
+  const weekMeets={
+    'Mon,09:00':'HDFC Bank — QBR',
+    'Tue,09:00':'Wipro — Follow-up',
+    'Wed,09:00':'Infosys — Intro',
+    'Wed,14:00':'Razorpay — Demo',
+    'Thu,10:00':'PhonePe — Discovery',
+    'Thu,15:00':'Paytm — Negotiation',
+    'Fri,11:00':'Ola Electric — Partnership',
+  };
+  let html='<div class="cal-week" style="margin-bottom:8px;"><div></div>';
+  weekDays.forEach(wd=>html+=`<div style="text-align:center;font-size:12px;font-weight:600;color:var(--gray-500);padding:6px 0;">${wd}</div>`);
+  html+='</div>';
+  times.forEach(t=>{
+    html+=`<div class="cal-week" style="margin-bottom:2px;"><div class="cw-time">${t}</div>`;
+    weekDays.forEach(wd=>{
+      const key=wd+','+t;
+      const meet=weekMeets[key];
+      html+=`<div class="cw-slot">${meet?`<div class="cw-evt">${meet}</div>`:''}</div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('cal-body').innerHTML=html;
+}
+function calPrev(){S.calOffset--;buildCal();}
+function calNext(){S.calOffset++;buildCal();}
+
+// ═══════════════════════════════════════════════════════════════════
+// NEWS FEED
+// ═══════════════════════════════════════════════════════════════════
+const allNews=[
+  {co:'infosys',cat:'partnership',age:'week',h:'Infosys and Microsoft Azure announce multi-year AI cloud migration partnership worth an estimated $500M over three years',src:'Economic Times',date:'28 May 2025',sum:'Infosys will leverage Microsoft\'s Azure OpenAI Service to build AI-powered cloud migration tools for enterprise clients, as part of the company\'s \'Topaz\' AI platform strategy.',tag:'Partnership',rel:'Meeting today',tagCls:'bg2'},
+  {co:'infosys',cat:'earnings',age:'month',h:'Infosys Q4 FY25 results: Revenue at $4.8B, up 4.2% YoY; CEO signals BFSI and manufacturing as priority segments for FY26',src:'Business Standard',date:'18 May 2025',sum:'Infosys exceeded analyst expectations in Q4, driven by large deal wins. Management guided for 0–3% FY26 revenue growth, citing macro uncertainty. Operating margin improved to 21.1%.',tag:'Earnings',rel:'Meeting today',tagCls:'bg2'},
+  {co:'infosys',cat:'product',age:'month',h:'Infosys launches \'Topaz\' AI platform — proprietary suite combining generative AI with industry-specific data models',src:'Hindu BusinessLine',date:'2 May 2025',sum:'Topaz is Infosys\'s flagship AI product, designed to help enterprise clients accelerate AI adoption. The platform includes pre-built models for BFSI, healthcare, and manufacturing.',tag:'Product',rel:'Meeting today',tagCls:'bg2'},
+  {co:'hdfc',cat:'earnings',age:'week',h:'HDFC Bank reports record net profit of ₹16,512 crore in Q4 FY25, up 22% YoY; NIM holds at 3.46%',src:'Business Today',date:'19 May 2025',sum:'HDFC Bank\'s Q4 performance exceeded analyst estimates across all metrics. Strong loan growth of 18.5% YoY. Capital adequacy ratio at 18.8% provides room for continued expansion.',tag:'Earnings',rel:'Meeting yesterday',tagCls:'bb'},
+  {co:'hdfc',cat:'product',age:'month',h:'HDFC Bank launches \'SmartHub Vyapar\' super-app for MSMEs; targets 15 million merchants in Tier 2 and Tier 3 cities',src:'Economic Times',date:'5 May 2025',sum:'SmartHub Vyapar integrates payments, working capital loans, and business analytics for small businesses. HDFC Bank aims to cross-sell to existing merchant relationships.',tag:'Product',rel:'',tagCls:'bgr'},
+  {co:'razorpay',cat:'funding',age:'month',h:'Razorpay surpasses ₹50,000 crore in annualised GMV; exploring IPO in 2026 as the company approaches profitability',src:'Mint',date:'12 May 2025',sum:'Razorpay processed over ₹50,000 crore in monthly GMV for the first time in April 2025. The company has been profitable at the operating level for 3 consecutive quarters.',tag:'Funding & IPO',rel:'Meeting today',tagCls:'bg2'},
+  {co:'razorpay',cat:'product',age:'week',h:'Razorpay launches \'Razorpay Capital\' — embedded lending for its 8 million merchant base',src:'YourStory',date:'22 May 2025',sum:'Razorpay is expanding from payments into financial services, offering working capital loans to merchants directly within the payment dashboard. A direct competitive move against traditional banks and NBFCs.',tag:'Product',rel:'Meeting today',tagCls:'bg2'},
+  {co:'tcs',cat:'partnership',age:'week',h:'TCS wins $1.5 billion multi-year AI transformation contract with leading European banking group',src:'Business Standard',date:'20 May 2025',sum:'TCS\'s BFSI vertical continues to win large transformation deals, validating CEO K. Krithivasan\'s focus on the sector. The deal includes AI-powered core banking modernisation and data platform migration.',tag:'Partnership',rel:'',tagCls:'bgr'},
+  {co:'tcs',cat:'product',age:'month',h:'TCS launches \'WisdomNext\' — enterprise AI platform combining generative AI with proprietary industry knowledge bases',src:'NDTV Profit',date:'8 May 2025',sum:'WisdomNext is TCS\'s answer to Infosys Topaz and Wipro\'s ai360. The platform includes pre-built AI agents for common enterprise workflows across BFSI, retail, and manufacturing.',tag:'Product',rel:'',tagCls:'bgr'},
+  {co:'zomato',cat:'product',age:'week',h:'Zomato launches \'District\' — an events and experiences super-app targeting urban India\'s lifestyle economy',src:'Economic Times',date:'25 May 2025',sum:'District allows users to discover and book tickets for concerts, sporting events, comedy shows, and experiences. Zomato is positioning it as the third pillar alongside food delivery and Blinkit.',tag:'Product',rel:'',tagCls:'bgr'},
+  {co:'zomato',cat:'earnings',age:'month',h:'Blinkit reaches 1,000 dark store milestone; Zomato targets 2,000 stores by FY26 end amid quick commerce battle',src:'Mint',date:'15 May 2025',sum:'Blinkit is now Zomato\'s fastest-growing segment, processing 850,000 daily orders. Zomato plans to invest ₹3,200 crore in Blinkit expansion in FY26.',tag:'Earnings',rel:'',tagCls:'bgr'},
+];
+function buildNews(){
+  const co=document.getElementById('nf-company')?.value||'all';
+  const time=document.getElementById('nf-time')?.value||'all';
+  const cat=document.getElementById('nf-cat')?.value||'all';
+  let filtered=allNews.filter(n=>(co==='all'||n.co===co)&&(cat==='all'||n.cat===cat));
+  document.getElementById('nf-count').textContent=filtered.length+' article'+(filtered.length!==1?'s':'');
+  document.getElementById('news-grid').innerHTML=filtered.map(n=>`
+    <div class="na">
+      <div class="na-src">${n.src} &nbsp;·&nbsp; ${n.date}</div>
+      <div class="na-h">${n.h}</div>
+      <div class="na-sum">${n.sum}</div>
+      <div class="na-foot">
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span class="na-tag badge ${n.tagCls}">${n.tag}</span>
+          ${n.rel?`<span class="na-rel">→ ${n.rel}</span>`:''}
+        </div>
+        <span class="na-date">${n.date}</span>
+      </div>
+    </div>`).join('');
+}
+function filterNews(){buildNews();}
+
+// ═══════════════════════════════════════════════════════════════════
+// MEETING NOTES
+// ═══════════════════════════════════════════════════════════════════
+function loadSample(){
+  document.getElementById('mn-input').value=`met with sanjay (vp sales) and priya (head of enterprise) from infosys
+- 45 min intro call
+- currently using linkedin sales navigator and manual google research for meeting prep
+- main pain: sales team of 18 reps, each spending 30-40 min before every meeting on prep
+- inconsistent quality - junior reps much less prepared than senior ones
+- missed a key client signal last month (leadership change) - cost them a deal
+- interested in ai automation but worried about data accuracy / hallucinations
+- budget available q2 fy26 - needs cfo sign off above rs 10 lakhs
+- sanjay liked the infosys brief example we showed
+- priya asked specifically about crm integration with salesforce
+- competitor mentioned: they looked at owler but found it too basic
+- agreed to a product demo next tuesday at 3pm
+- sanjay will loop in their it security team for the demo
+- action: send demo calendar invite + product overview deck tonight`;
+}
+function generateNotes(){
+  const raw=document.getElementById('mn-input').value.trim();
+  if(!raw){showToast('Please enter your raw meeting notes first','error');return;}
+  const btn=document.getElementById('mn-btn');
+  btn.textContent='Generating...';btn.disabled=true;
+  setTimeout(()=>{
+    const meeting=document.getElementById('mn-meeting').value;
+    const output=`<div class="mn-section">
+  <div class="mn-title">Meeting Details</div>
+  <div class="mn-item"><strong>Meeting:</strong> ${meeting}</div>
+  <div class="mn-item"><strong>Attendees:</strong> Sanjay (VP Sales), Priya (Head of Enterprise), Rahul Mehta (Prelude AI)</div>
+  <div class="mn-item"><strong>Duration:</strong> 45 minutes</div>
+  <div class="mn-item"><strong>Type:</strong> Introductory discovery call</div>
+</div>
+<div class="mn-section">
+  <div class="mn-title">Key Discussion Points</div>
+  <div class="mn-item">Current process: 18-person sales team using LinkedIn Sales Navigator and manual Google research for meeting prep</div>
+  <div class="mn-item">Pain point: Reps spending 30–40 minutes on prep before every meeting; quality inconsistent between junior and senior reps</div>
+  <div class="mn-item">Critical incident: A missed leadership change at a client company cost them a deal last month</div>
+  <div class="mn-item">Existing tools evaluated: Owler — found too basic with limited synthesis capability</div>
+  <div class="mn-item">CRM in use: Salesforce — Priya specifically asked about integration capability</div>
+</div>
+<div class="mn-section">
+  <div class="mn-title">Decisions Made</div>
+  <div class="mn-item">Agreed to proceed to a product demo next Tuesday at 15:00</div>
+  <div class="mn-item">IT security team to be included in the demo session</div>
+</div>
+<div class="mn-section">
+  <div class="mn-title">Objections & Concerns</div>
+  <div class="mn-item">Data accuracy and AI hallucination risk — sceptical about AI-generated factual content</div>
+  <div class="mn-item">Budget approval required from CFO for commitments above ₹10 lakhs</div>
+</div>
+<div class="mn-section">
+  <div class="mn-title">Action Items</div>
+  <div class="mn-item">📤 <strong>Rahul:</strong> Send demo calendar invite to Sanjay and Priya by tonight</div>
+  <div class="mn-item">📤 <strong>Rahul:</strong> Send product overview deck highlighting data sourcing, accuracy methodology, and Salesforce integration</div>
+  <div class="mn-item">📋 <strong>Rahul:</strong> Prepare a Salesforce CRM integration demo specifically for Priya</div>
+  <div class="mn-item">📋 <strong>Rahul:</strong> Prepare data accuracy documentation for IT security team review</div>
+</div>
+<div class="mn-section">
+  <div class="mn-title">Deal Context</div>
+  <div class="mn-item"><strong>Stage:</strong> Moving from Prospecting → Demo / Evaluation</div>
+  <div class="mn-item"><strong>Budget:</strong> Available Q2 FY26 · Requires CFO approval above ₹10 lakhs</div>
+  <div class="mn-item"><strong>Decision criteria:</strong> Data accuracy, Salesforce integration, ease of adoption for 18 reps</div>
+  <div class="mn-item"><strong>Champion:</strong> Sanjay (VP Sales) — engaged, showed interest in demo brief</div>
+  <div class="mn-item"><strong>Blocker:</strong> IT security review, CFO budget approval</div>
+  <div class="mn-item"><strong>Next step:</strong> Product demo — Tuesday, next week, 15:00</div>
+</div>`;
+    document.getElementById('mn-out').innerHTML=output;
+    btn.textContent='✨ Generate structured notes';btn.disabled=false;
+    showToast('Meeting notes structured successfully','success');
+  },2000);
+}
+function copyNotes(){
+  const el=document.getElementById('mn-out');
+  const text=el.innerText;
+  navigator.clipboard.writeText(text).then(()=>showToast('Notes copied to clipboard','success')).catch(()=>showToast('Copy failed — please select and copy manually','warn'));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// AI COACH
+// ═══════════════════════════════════════════════════════════════════
+const coachResponses={
+  'how do i open the infosys meeting':
+    `Great question. Based on the Infosys brief, here's how I'd open:\n\n**Lead with the Azure news.** Something like: "I saw the Microsoft Azure partnership announcement last week — congratulations on that. How is the Topaz platform landing internally? Are clients already asking for it specifically?"\n\nWhy this works: (1) It shows you've done your homework. (2) It's not a cold opener — it's based on something that actually happened to them. (3) It invites them to talk about their strategic direction, which is where you want the conversation to go.\n\n**Avoid:** Opening with your product pitch. Opening with "Tell me about your business" — they're a $18.6B company, do your research. This brief gives you the research.`,
+  'what are the key talking points for infosys':
+    `Based on the brief, here are your 3 highest-impact talking points:\n\n**1. BFSI focus** — CEO Salil Parekh explicitly named BFSI as a priority deal segment for FY26. If you have BFSI case studies or use cases, lead with those.\n\n**2. AI-first positioning** — Infosys just launched Topaz. They want to be seen as an AI-first company. Frame your product in terms of how it fits their AI narrative, not as a traditional software purchase.\n\n**3. Conservative FY26 guidance** — Management guided 0–3% revenue growth. This means internal budget pressure. Lead with ROI and fast time-to-value, not premium pricing or multi-year commitments in the first meeting.`,
+  'how should i handle budget objections':
+    `If they push back on price, here's a framework based on their financials:\n\n**Anchor to the cost of the problem:** If a single missed signal (like a CFO change) costs a deal, what's that deal worth? For an $18.6B company, even a small deal is likely ₹50–500 lakhs. That makes Prelude AI essentially free.\n\n**Use the time savings math:** 18 reps × 30 min per meeting × 5 meetings/day = 45 hours of prep time per day. At even a conservative billing rate, that's significant recoverable value.\n\n**Offer a pilot:** "Let's start with 5 reps for 30 days. If they don't walk into better-prepared meetings, we stop." A time-bounded pilot removes the budget approval conversation entirely.\n\n**Avoid:** Discounting in the first meeting. It signals low confidence in the product.`,
+  'what buying signals should i look for':
+    `Watch for these signals during the Infosys meeting:\n\n🟢 **Strong buy signals:**\n- They reference a specific meeting or deal where poor prep hurt them (like our case study)\n- They ask detailed questions about Salesforce/HubSpot integration (means they're imagining adoption)\n- They ask about pricing before you bring it up\n- They ask "how quickly could we get started?"\n- They mention they've already tried a competitor and found it insufficient\n\n🟡 **Neutral (needs more work):**\n- Lots of general questions — they're still evaluating\n- "We'll need to involve IT" — not a no, but adds a step\n\n🔴 **Watch out for:**\n- "We already have a process that works" — challenge this gently with ROI data\n- "Budget is locked for the year" — explore if there's discretionary spend or Q2 budget`,
+  'how do i use the microsoft azure news':
+    `The Microsoft Azure partnership is your most powerful opener. Here's how to use it tactically:\n\n**As an opener (first 2 minutes):**\n"I was reading about the Microsoft Azure partnership last week — congratulations on that. The Topaz platform launch feels like Infosys planting a flag on AI-first. How is that landing with your enterprise clients?"\n\n**As a product alignment moment:**\nIf they talk about Topaz, you can say: "What we do with meeting prep actually mirrors what Topaz does for client engagements — we're taking unstructured signals from across the web and synthesising them into something actionable. Same philosophy, different context."\n\n**What NOT to do:**\nDon't name-drop the news as a credential ("I research all my meetings"). Use it to start a conversation, not to impress.`,
+  'write a follow-up email for after the demo':
+    `Here's a follow-up email you can personalise:\n\n---\nSubject: Following up — Prelude AI demo + next steps\n\nHi Sanjay,\n\nThank you for the time today — it was a genuinely useful conversation. A few things I wanted to follow up on:\n\n1. **Salesforce integration:** I've asked our team to prepare a detailed walkthrough of the CRM sync specifically for Priya's review. I'll send this across tomorrow.\n\n2. **Data accuracy documentation:** I know the IT security team will want to review our data sourcing methodology. I'm attaching our data governance overview to this email.\n\n3. **Pilot proposal:** Based on our conversation, I'd suggest starting with 5 reps for 30 days. I'll put together a simple pilot scope document — happy to discuss before we formalise anything.\n\nWould Thursday or Friday this week work for a 20-minute call to review the next steps?\n\nBest,\nRahul\n---`,
+};
+function sendQ(q){
+  const inp=document.getElementById('chat-inp');
+  inp.value=q;
+  sendChat();
+}
+function sendChat(){
+  const inp=document.getElementById('chat-inp');
+  const q=inp.value.trim();
+  if(!q)return;
+  const msgs=document.getElementById('chat-msgs');
+  msgs.innerHTML+=`<div class="msg user">${q}</div>`;
+  inp.value='';
+  msgs.scrollTop=msgs.scrollHeight;
+  const key=q.toLowerCase().replace(/[^a-z0-9 ]/g,'').trim();
+  let resp=null;
+  for(const k of Object.keys(coachResponses)){
+    if(key.includes(k.substring(0,15))||k.includes(key.substring(0,15))){resp=coachResponses[k];break;}
+  }
+  if(!resp) resp=`Great question. Based on the brief for your upcoming Infosys meeting, I'd approach this by focusing on their Q4 results beat and the Microsoft Azure partnership. Both signals indicate a company that's in growth mode and investing in AI — which means they're likely open to new tools that align with that direction. Would you like me to suggest specific talking points or a recommended opening?`;
+  setTimeout(()=>{
+    msgs.innerHTML+=`<div class="msg ai" style="white-space:pre-wrap;">${resp}</div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  },800);
+}
+function setCoachCtx(ctx){
+  document.getElementById('coach-ctx').textContent=ctx;
+  const msgs=document.getElementById('chat-msgs');
+  msgs.innerHTML=`<div class="msg ai">I've switched context to <strong>${ctx}</strong>. What would you like to prepare for this meeting?</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PAYMENT
+// ═══════════════════════════════════════════════════════════════════
+function showPaymentModal(){document.getElementById('pay-ov').classList.remove('hidden');document.body.style.overflow='hidden';}
+function closePay(){document.getElementById('pay-ov').classList.add('hidden');document.body.style.overflow='';}
+function fmtCard(el){let v=el.value.replace(/\D/g,'').substring(0,16);el.value=v.replace(/(.{4})/g,'$1 ').trim();}
+function doPay(){
+  const n=document.getElementById('pay-name').value;
+  const num=document.getElementById('pay-num').value.replace(/\s/g,'');
+  const exp=document.getElementById('pay-exp').value;
+  const cvc=document.getElementById('pay-cvc').value;
+  const em=document.getElementById('pay-email').value;
+  if(!n){showToast('Please enter the name on your card','error');return;}
+  if(num.length<16){showToast('Please enter a valid 16-digit card number','error');return;}
+  if(!exp||exp.length<4){showToast('Please enter a valid expiry date (MM/YY)','error');return;}
+  if(!cvc||cvc.length<3){showToast('Please enter a valid 3-digit CVC','error');return;}
+  if(!em||!em.includes('@')){showToast('Please enter your billing email','error');return;}
+  const btn=document.getElementById('pay-btn');
+  btn.textContent='Processing...';btn.disabled=true;
+  setTimeout(()=>{
+    closePay();
+    document.getElementById('sb-pill').textContent='GROWTH';
+    document.getElementById('sb-pill').style.background='var(--signal)';
+    document.getElementById('sb-flabel').textContent='Unlimited briefs';
+    document.getElementById('sb-ff').style.width='0%';
+    showToast('🎉 Welcome to Growth! Your plan is now active.','success');
+    setTimeout(()=>showToast('CRM integration and social signals are now enabled ✓','success'),1800);
+    btn.textContent='Pay ₹2,499 →';btn.disabled=false;
+    showScreen('dashboard');
+  },2200);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════════════════
+function searchBriefs(q){
+  if(q) showScreen('briefs');
+  document.querySelectorAll('#briefs-body tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';});
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════════════
+function saveSettings(){
+  const n=document.getElementById('set-name').value;
+  const e=document.getElementById('set-email').value;
+  if(n){S.user.name=n;document.getElementById('sb-name').textContent=n;setGreeting();}
+  if(e){S.user.email=e;document.getElementById('sb-email').textContent=e;}
+  showToast('Settings saved successfully','success');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════════════
+function toggleNotif(){document.getElementById('notif-ov').classList.toggle('hidden');}
+
+// ═══════════════════════════════════════════════════════════════════
+// GUIDED TOUR
+// ═══════════════════════════════════════════════════════════════════
+const tourSteps=[
+  {screen:'dashboard',target:'#s-dashboard .topbar',title:'Welcome to Prelude AI',desc:'This is your Overview — a real-time dashboard showing your meeting briefs, time saved, and upcoming meetings. Everything you need is here.',pos:'below'},
+  {screen:'dashboard',target:'#s-dashboard .sgrid',title:'Your Stats',desc:'These four numbers tell you how Prelude AI is performing for you: briefs generated, time saved, your average brief quality rating, and when your next brief will arrive.',pos:'below'},
+  {screen:'dashboard',target:'.bc:first-of-type',title:'Brief Cards',desc:'Each card here is a company brief generated before a real meeting. Click the card to expand a preview, or click "View full brief" to see the complete intelligence report — including leadership profiles, financials, and news.',pos:'below'},
+  {screen:'calendar',target:'#s-calendar',title:'Calendar',desc:'Your Calendar shows all upcoming meetings with their brief status. Switch between Month and Week views. Click any date to see what meetings are scheduled.',pos:'center'},
+  {screen:'news',target:'#s-news',title:'News Feed',desc:'The News Feed shows recent business news relevant to companies you meet. Use the filters to narrow by company, time period, and news category — earnings, leadership changes, funding rounds, and more.',pos:'center'},
+  {screen:'notes',target:'#s-notes',title:'AI Meeting Notes',desc:'After a meeting, paste your raw notes here. The AI structures them into a professional format with attendees, key points, decisions, action items, and deal context — ready to save to your CRM.',pos:'center'},
+  {screen:'coach',target:'#s-coach',title:'AI Sales Coach',desc:'Your AI Coach knows your upcoming meetings and can help you prepare: how to open the meeting, what talking points to use, how to handle objections, and what buying signals to look for.',pos:'center'},
+  {screen:'upgrade',target:'#s-upgrade',title:'Upgrade your plan',desc:'The Starter plan gives you unlimited briefs, news, and financial data. Upgrade to Growth to unlock CRM integration, social signal monitoring, the team dashboard, and priority support. Click "Upgrade to Growth" to try the payment flow.',pos:'center'},
+];
+let tourIdx=0;
+function startTour(){
+  tourIdx=0;
+  document.getElementById('tour-overlay').classList.remove('hidden');
+  renderTour();
+}
+function endTour(){document.getElementById('tour-overlay').classList.add('hidden');}
+function tourStep(n){
+  tourIdx=Math.max(0,Math.min(n,tourSteps.length-1));
+  renderTour();
+}
+function renderTour(){
+  const step=tourSteps[tourIdx];
+  showScreen(step.screen);
+  document.getElementById('tour-step-label').textContent='Step '+(tourIdx+1)+' of '+tourSteps.length;
+  document.getElementById('tour-title').textContent=step.title;
+  document.getElementById('tour-desc').textContent=step.desc;
+  const dots=document.getElementById('tour-dots');
+  dots.innerHTML=tourSteps.map((_,i)=>`<div class="tour-dot${i===tourIdx?' on':''}"></div>`).join('');
+  document.getElementById('tour-prev').disabled=(tourIdx===0);
+  document.getElementById('tour-next').textContent=tourIdx===tourSteps.length-1?'Finish ✓':'Next →';
+  if(tourIdx===tourSteps.length-1) document.getElementById('tour-next').onclick=endTour;
+  else document.getElementById('tour-next').onclick=()=>tourStep(tourIdx+1);
+  // Position the tour box
+  const box=document.getElementById('tour-box');
+  const ring=document.getElementById('tour-ring');
+  if(step.pos==='center'){
+    box.style.top='50%';box.style.left='50%';box.style.transform='translate(-50%,-50%)';
+    ring.style.display='none';
+  } else {
+    const el=document.querySelector(step.target);
+    if(el){
+      const r=el.getBoundingClientRect();
+      ring.style.display='block';
+      ring.style.top=(r.top-6)+'px';ring.style.left=(r.left-6)+'px';
+      ring.style.width=(r.width+12)+'px';ring.style.height=(r.height+12)+'px';
+      const boxTop=r.bottom+16;
+      box.style.top=Math.min(boxTop,window.innerHeight-300)+'px';
+      box.style.left=Math.max(10,Math.min(r.left,window.innerWidth-320))+'px';
+      box.style.transform='none';
+    }
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeFull();closePay();endTour();document.getElementById('notif-ov').classList.add('hidden');}
+  if(e.key==='ArrowRight'&&!document.getElementById('tour-overlay').classList.contains('hidden'))tourStep(tourIdx+1);
+  if(e.key==='ArrowLeft'&&!document.getElementById('tour-overlay').classList.contains('hidden'))tourStep(tourIdx-1);
+});
+setGreeting();
+</script>
+</body>
+</html>
